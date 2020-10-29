@@ -1,0 +1,19 @@
+{
+  "name": "kidtalk-mobile",
+  "version": "0.1.0",
+  "description": "Mobile app versions of Kidtalk (Android/iOS) via Capacitor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chipstudio/kidtalk-mobile.git"
+  },
+  "author": "Chip Studio",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chipstudio/kidtalk-mobile/issues"
+  },
+  "homepage": "https://github.com/chipstudio/kidtalk-mobile#readme"
+}
