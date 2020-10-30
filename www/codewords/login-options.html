@@ -1,0 +1,142 @@
+<login-options definition>
+
+	<template>
+        <div class="logo-container">
+            <img src="/images/SVG/Logo/KidTalk_Logo.svg" class="logo">
+            <div style="font-size:2rem; font-weight:700; padding:40px 0 0 0; text-align:center">KidTalk</div>
+        </div>
+
+        <div class="button-wrapper">
+            <div class="login-button google" onclick="login('google')">
+                <span class="icon-wrapper">
+                    <img class="icon" alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+                </span>
+                <span class="text">Sign in with Google</span>
+            </div>
+            <div class="login-button facebook" onclick="login('facebook')">
+                <span class="icon-wrapper">
+                    <img class="icon" alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/facebook.svg">
+                </span>  
+                <span class="text">Sign in with Facebook</span>  
+            </div>
+            <div class="login-button email" onclick="login('email')">
+                <span class="text">Sign in with Email</span> 
+            </div>
+        </div>
+	</template>
+
+	<style>
+        .logo-container {
+            text-align:center;
+        }
+
+        .logo-container img {
+            height:auto;
+            width:100px;
+        }
+
+		.button-wrapper {
+			padding-top:50px;
+			text-align:center;
+		}
+
+		.login-button {
+            margin: 10px auto;
+            direction: ltr;
+            font-weight: 500;
+            height: auto;
+            line-height: normal;
+            max-width: 220px;
+            min-height: 40px;
+            padding: 8px 16px;
+            text-align: left;
+            width: 100%;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+            border: none;
+            border-radius: 2px;
+            color: #000;
+            position: relative;
+            min-width: 64px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            overflow: hidden;
+            will-change: box-shadow;
+            transition: box-shadow .2s cubic-bezier(.4,0,1,1),background-color .2s cubic-bezier(.4,0,.2,1),color .2s cubic-bezier(.4,0,.2,1);
+            outline: 0;
+            cursor: pointer;
+            text-decoration: none;
+            vertical-align: middle;
+            display: table;
+        }
+
+        .icon-wrapper {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .icon {
+            border: none;
+            display: inline-block;
+            height: 18px;
+            vertical-align: middle;
+            width: 18px;
+        }
+
+        .text {
+            color: #fff;
+            display: table-cell;
+            font-size: 14px;
+            padding-left: 16px;
+            text-transform: none;
+            vertical-align: middle;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+
+        .google .text{
+            color: #757575;
+        }
+
+        .facebook {
+            background-color: #3b5998;
+        }
+        .twitter {
+            background-color: #00ACEE;
+        }
+
+        .email {
+            background-color: #FF7648;
+            text-align: center;
+        }
+	</style>
+
+    <script>
+        function login (provider) {
+            var provider_obj;
+            if (provider == "google") {
+                provider_obj = new firebase.auth.GoogleAuthProvider()
+            } else if (provider == "facebook") {
+                provider_obj = new firebase.auth.FacebookAuthProvider()
+            } else if (provider == "email") {
+                var email = prompt("Please enter your email address")
+                alert("Please check your email address for a one-time sign-in link")
+                var link_settings = {
+                    url: window.location.href,
+                    handleCodeInApp: true,
+                };
+                firebase.auth().sendSignInLinkToEmail(email, link_settings).then(function() {
+                    window.localStorage.setItem('emailForSignIn', email);
+                }).catch(function(error) {
+                    console.log(error)
+                });
+            }
+
+            if (provider_obj) {
+                firebase.auth().signInWithRedirect(provider_obj)
+            }
+        }
+    </script>
+
+</kidtalk-logo>

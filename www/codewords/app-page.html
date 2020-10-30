@@ -1,0 +1,197 @@
+<app-page definition>
+  <template>
+    <div class="app-page" link="<url-></url->">
+      <content-></content->
+    </div>
+
+    <style>
+      #app-pages[page="<url-></url->"] .app-page[link="<url-></url->"] {
+        display: block;
+        height: auto;
+        transform: translateX(0%);
+      }
+    </style>
+  </template>
+
+  <style>
+    #app-pages .app-page {
+      transition: transform 400ms cubic-bezier(0.175, 0.585, 0.32, 1.275);
+      transform: translateX(100%);
+    }
+
+    #app-pages {
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      position: relative;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      -moz-overflow-scrolling: touch;
+      overflow-scrolling: touch;
+      overflow-x: hidden;
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+      width: 100vw;
+    }
+
+    #notify {
+      position: fixed;
+      box-sizing: border-box;
+      left: 50%;
+      top: 30vh;
+      margin-left: -150px;
+      width: 300px;
+      color: #000;
+      font-weight: 700;
+      background-color: #fff;
+      box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      font-size: 1.2rem;
+      text-align: center;
+      visibility: hidden;
+      z-index: 4;
+    }
+
+    #notify[visible="true"] {
+      visibility: visible;
+    }
+
+    .app-page {
+      background-color: #fff;
+      box-sizing: border-box;
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 65px 20px;
+      height: 0;
+      overflow: hidden;
+      /*overflow-y:scroll;*/
+      /*-webkit-overflow-scrolling:touch;*/
+      /*-moz-overflow-scrolling:touch;*/
+      /*overflow-scrolling:touch;*/
+      width: 100vw;
+    }
+
+    button,
+    input[type="submit"] {
+      appearance: none;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+
+    .modal-container {
+      transition: transform 400ms cubic-bezier(0.175, 0.585, 0.32, 1.275);
+      transform: translateX(100%);
+      z-index: 10;
+    }
+
+    .modal-container {
+      box-sizing: border-box;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      z-index: 5;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 20vh auto 0 auto;
+      max-width: 320px;
+      box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.2);
+      min-height: 200px;
+      padding: 0 15px 15px 15px;
+      max-height: 70vh;
+      overflow-y: scroll;
+      position: relative;
+      z-index: 5;
+    }
+
+    .modal-content form {
+      color: #ff7648;
+      padding: 0 40px 20px 40px;
+    }
+    .delete-model {
+      border-radius: 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 auto;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .delete-model::before {
+      content: "X ";
+    }
+
+    .modal-content form input,
+    .modal-content form select[name=email]{
+      border: 2px solid black;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      height: 2rem;
+      width: 100%;
+    }
+
+    .modal-content form select[name=email]{
+      height: 2.5rem;
+      text-align-last: center;
+    }
+
+    .modal-content form input,
+    .modal-content form select {
+      margin-top: 1rem;
+    }
+
+    .modal-content form .field-wrapper:first-child label {
+      margin-top: 0;
+    }
+
+    .modal-content form input[type="submit"] {
+      background: #ff7648;
+      border: none;
+      border-radius: 2rem;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      height: auto;
+      margin: 2rem auto 1rem auto;
+      padding: 0.7rem;
+    }
+
+    label {
+      text-transform: capitalize;
+    }
+
+    .modal-content form label {
+      font-size: 1.6rem;
+      margin-top: 1rem;
+    }
+
+    .modal-content form input,
+    .modal-content form label {
+      display: block;
+      text-align: center;
+    }
+
+    .modal-container .modal-close {
+      box-sizing: border-box;
+      color: black;
+      cursor: pointer;
+      padding: 20px 10px;
+    }
+
+    .modal-container .modal-close svg {
+      fill: black;
+      height: auto;
+      width: 30px;
+    }
+
+    body[show-modal="true"] .modal-container {
+      transform: translateX(0%);
+    }
+  </style>
+</app-page>

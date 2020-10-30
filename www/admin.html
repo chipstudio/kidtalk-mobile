@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>KidTalk Admin</title>
+    <script src="/doc.js?t=10"></script>
+    <script src="/data.js?t=10"></script>
+    <script src="/models.js?t=10"></script>
+    <script src="https://codeword.it"></script>
+    <link rel="stylesheet" href="/reset.css" />
+    <link rel="stylesheet" href="/polyfills/rangeslider.css" />
+    <link rel="stylesheet" href="https://use.typekit.net/sav4wzk.css" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <style>
+      body {
+        font-family: proxima-soft, sans-serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      h1 {
+        font-size: 2rem;
+        text-align: center;
+        font-weight: 700;
+        padding: 15px 0;
+        width: 100%;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      table td,
+      table th {
+        border-right: 1px solid #000;
+        box-sizing: border-box;
+        padding: 10px 20px;
+        text-align: left;
+        width: 25%;
+      }
+
+      table th {
+        border-bottom: 1px solid #000;
+        font-weight: 700;
+      }
+
+      td a {
+        color: blue;
+        cursor: pointer;
+      }
+
+      table tr:nth-child(odd) {
+        background-color: #efefef;
+      }
+
+      table td:last-child {
+        border-right-width: 0;
+      }
+
+      audio:first-child {
+        margin-top: 15px;
+      }
+
+      #modal-content {
+        background-color: yellow;
+        color: #000;
+        display: none;
+        font-weight: 700;
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      body[show-modal="true"] #modal-content {
+        display: block;
+      }
+
+      .recording-health {
+        float: right;
+        display: inline;
+        padding-right: 10px;
+      }
+
+      .download-export {
+        float: right;
+        display: inline;
+        padding-right: 30px;
+      }
+    </style>
+
+    <script>
+      function update_verified(select_field) {
+        var user_id = select_field.closest("tr").id;
+        var verification_selected = {
+          verified: select_field.value == "true",
+        };
+
+        data
+          .update_model("User", user_id, verification_selected)
+          .then(function () {
+            doc.notify_success("User successfully updated!");
+          });
+      }
+
+      function recording_loader(recordings, r, container) {
+        return new Promise(function (resolve, reject) {
+          if (r < recordings.length) {
+            load_recording_url(recordings[r].id).then(function (response) {
+              var recording_template = doc.get_id("recording-template");
+              container.appendChild(
+                doc.render(recording_template, {
+                  audio_file: response[0],
+                })
+              );
+
+              recording_loader(recordings, r + 1, container);
+            });
+          }
+        });
+      }
+
+      var recording_subscription = null;
+      function load_recordings(load_button) {
+        var user_id = load_button.closest("tr").id;
+
+        data.unsubscribe(recording_subscription);
+        recording_subscription = data.subscribe_collection("Recording", {
+          query: function (query) {
+            return query
+              .where("private", "==", false)
+              .where("file_time", ">=", 1591232628186)
+              .where("user_id", "==", user_id);
+          },
+          update: function (recordings) {
+            var short_recordings = [];
+            recordings.forEach(function (recording) {
+              if (
+                recording.duration > 0 &&
+                recording.duration < 10 &&
+                recording.hasOwnProperty("audio_file")
+              ) {
+                short_recordings.push(recording);
+              }
+            });
+
+            var container = load_button.nextElementSibling;
+            container.innerHTML = "";
+            recording_loader(short_recordings, 0, container);
+
+            if (short_recordings.length == 0) {
+              load_button.innerHTML = "No Recordings Available";
+            }
+          },
+        });
+      }
+
+      function load_recording_url(recording_id) {
+        return new Promise(function (resolve, reject) {
+          var get_url =
+            window.location.origin + "/get_recording_url/" + recording_id;
+          var xhr = new XMLHttpRequest();
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+              resolve(JSON.parse(xhr.responseText));
+            }
+          };
+          xhr.open("GET", get_url, true);
+          xhr.send(null);
+        });
+      }
+
+      /**
+       * Calls recording health cloud function.
+       *
+       * @return Promise
+       */
+      function recording_health() {
+        return new Promise(function (resolve, reject) {
+          var get_url = window.location.origin + "/recording_health/";
+
+          var xhr = new XMLHttpRequest();
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+              try {
+                resolve(JSON.parse(xhr.responseText));
+              } catch (error) {
+                console.log("xhr.onreadystatechange -> error", error);
+                resolve({});
+              }
+            }
+          };
+          xhr.open("GET", get_url, true);
+          xhr.send(null);
+        });
+      }
+
+      /**
+       * Retrieve recording health data and insert into DOM.
+       *
+       * @return Null
+       */
+      function load_recording_health() {
+        recording_health()
+          .then((response) => {
+            doc.get_id("total-recordings").textContent =
+              response.totalRecordings;
+            doc.get_id("unprocessed-recordings").textContent =
+              response.unprocessedRecordingsTotal;
+            doc.get_id("percent-unprocessed").textContent = Math.floor(
+              (response.unprocessedRecordingsTotal / response.totalRecordings) *
+                100
+            );
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+      }
+
+      /**
+       * Handle onChange event from exports select and start download
+       *
+       * @return Null
+       */
+      function download_export(selected_value) {
+        if (selected_value) {
+          var storageRef = firebase.storage().ref();
+          let export_ref = storageRef.child(selected_value);
+
+          export_ref.getDownloadURL().then(function (url) {
+            window.location = url;
+          });
+        }
+      }
+
+      /**
+       * Capitlize each word in string.
+       *
+       * @return String
+       */
+      function title_case(str) {
+        var splitStr = str.toLowerCase().split(" ");
+        for (var i = 0; i < splitStr.length; i++) {
+          // You do not need to check if i is larger than splitStr length, as your for does that for you
+          // Assign it back to the array
+          splitStr[i] =
+            splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        // Directly return the joined string
+        return splitStr.join(" ");
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Verification Portal</h1>
+
+    <input
+      type="checkbox"
+      id="say-what-eligible"
+      name="checkbox"
+      checked
+      onchange="load_users()"
+    />
+    <label for="say-what-eligible">
+      Only show users with "say what" eligible clips
+    </label>
+
+    <div class="recording-health">
+      Unprocessed recordings (last two weeks):
+      <span id="unprocessed-recordings"></span> of
+      <span id="total-recordings"></span>
+      (<span id="percent-unprocessed"></span>%)
+      <button type="button" onclick="repair_recordings()">Repair</button>
+    </div>
+
+    <div class="download-export">
+      Download export:
+      <select id="exports" onchange="download_export(this.value)">
+        <option value="">Select...</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <th>User ID</th>
+        <th>First Name</th>
+        <th>Verified</th>
+        <th>Public Recordings</th>
+      </thead>
+    </table>
+
+    <div id="modal-close"></div>
+    <div id="modal-content">Test Content</div>
+
+    <table id="users"></table>
+
+    <template id="user-template">
+      <tr id="{{id}}">
+        <td>{{id}}</td>
+        <td>{{first_name}}</td>
+        <td>
+          <select value="{{verified}}" onchange="update_verified(this)">
+            <option value="false">Not Verified</option>
+            <option value="true" {{vselected}}>Verified</option>
+          </select>
+        </td>
+        <td>
+          <a onclick="load_recordings(this)">Load Recordings</a>
+          <div class="public-recordings"></div>
+        </td>
+      </tr>
+    </template>
+
+    <template id="recording-template">
+      <audio controls src="{{audio_file}}"></audio>
+    </template>
+
+    <script type="text/javascript" src="/libs/CryptoJS.js"></script>
+    <script src="/libs/firebase/app.js"></script>
+    <script src="/libs/firebase/analytics.js"></script>
+    <script src="/libs/firebase/auth.js"></script>
+    <script src="/libs/firebase/firestore.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="/libs/firebase/storage.js"></script>
+    <script>
+      window.db = firebase.firestore();
+      var user_subscription = null;
+
+      // Control page access
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          var hashed_email = CryptoJS.MD5(user.email).toString();
+          if (
+            hashed_email != "51da12ce785b14b72a66cf36ca9e0da6" &&
+            hashed_email != "c48dcf0deaf3cdb75fc638829ab138d2" &&
+            hashed_email != "9a5df9917a3440f0635ee5b2ec90f296" &&
+            hashed_email != "ce95bb311e4266cf3e1c814272a24197"
+          ) {
+            alert(
+              "You do not have access to this page. Please contact an admin to gain access"
+            );
+            window.location.href = "/";
+          }
+
+          load_users();
+        } else {
+          window.location.href = "/login";
+        }
+      });
+
+      load_recording_health();
+
+      // Populate data export dropdown
+      var storageRef = firebase.storage().ref();
+      let recordings_ref = storageRef.child("exports/recordings");
+      let exports_select = doc.get_id("exports");
+
+      recordings_ref.listAll().then(function (res) {
+        res.items.forEach(function (itemRef) {
+          var option = document.createElement("option");
+          option.text = title_case(
+            itemRef.name
+              .replace("export_", "")
+              .replace(".zip", "")
+              .replace(/_/g, " ")
+          );
+          option.value = itemRef.fullPath;
+          exports_select.add(option);
+        });
+      });
+
+      let collections_ref = storageRef.child(
+        "exports/collections/export_collections.zip"
+      );
+      collections_ref.getMetadata().then(function (metadata) {
+        var option = document.createElement("option");
+        option.text = "Collections " + metadata.timeCreated.substring(0, 10);
+        option.value = collections_ref.fullPath;
+        exports_select.add(option);
+      });
+
+      /**
+       * Loads users from db and adds them to the table in the DOM.
+       *
+       * @return Null
+       */
+      function load_users() {
+        var recording_subscription = null;
+        data.unsubscribe(recording_subscription);
+
+        var displayed_user_ids = [];
+        // Get all recordings filtered by private=true and file_time
+        recording_subscription = data.subscribe_collection("Recording", {
+          query: function (query) {
+            return query
+              .where("private", "==", false)
+              .where("file_time", ">=", 1591232628186);
+          },
+          update: function (recordings) {
+            var short_recordings = [];
+
+            // Fitler for shorter recordings, with audio file, and is_clip=true
+            recordings.forEach(function (recording) {
+              recording.duration = parseFloat(recording.duration);
+
+              if (
+                recording.duration > 0 &&
+                recording.duration < 10 &&
+                recording.hasOwnProperty("audio_file")
+              ) {
+                short_recordings.push(recording);
+              }
+            });
+
+            // Get array of user_ids of all recordings
+            let unfiltered_user_ids = short_recordings.map(
+              (recording) => recording.user_id
+            );
+            // Filter for unique user_ids
+            displayed_user_ids = [...new Set(unfiltered_user_ids)];
+          },
+        });
+
+        data.subscribe_collection("User", {
+          update: function (users) {
+            users.forEach(function (user) {
+              if (user.hasOwnProperty("verified") && user.verified == true) {
+                user.vselected = "selected";
+              } else {
+                user.vselected = "";
+              }
+            });
+
+            //   Filter users for say what eligible
+            if (doc.get_id("say-what-eligible").checked == true) {
+              users = users.filter((user) =>
+                displayed_user_ids.includes(user.id)
+              );
+            }
+
+            doc.clear_and_replace(
+              users,
+              doc.get_id("users"),
+              doc.get_id("user-template")
+            );
+          },
+        });
+      }
+
+      /**
+       * Add true processed flag for recordings where it is missing but recording file is accessable.
+       *
+       * @return Null
+       */
+      function repair_recordings() {
+        var get_url =
+          window.location.origin + "/repair_recordings/?duration=14";
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == XMLHttpRequest.DONE) {
+            try {
+              alert(
+                JSON.parse(xhr.responseText).repairedRecordings +
+                  " recording(s) successfully repaired."
+              );
+            } catch (error) {
+              console.log("xhr.onreadystatechange -> error", error);
+              alert("Error repairing recording(s): " + error);
+            }
+          }
+        };
+        xhr.open("GET", get_url, true);
+        xhr.send(null);
+      }
+    </script>
+  </body>
+</html>

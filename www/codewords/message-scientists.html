@@ -1,0 +1,68 @@
+<message-scientists definition>
+
+	<template>
+		<template id="message-template">
+			<a class="message-title" href="{{link}}" target="_blank"><span>{{pubDate}}</span><br> {{title}}</a>
+		</template>
+
+		<h5 class="message-scientists-header">Review the updates from the scientists building KidTalk!</h5>
+
+		<div id="messages"></div>
+	</template>
+
+	<style>
+		.message-title {
+			box-sizing:border-box;
+			border-bottom:1px solid #000;
+			color:#000;
+			font-weight:700;
+			font-size:1.4rem;
+			line-height:1.2em;
+			display:block;
+			padding:15px;
+		}
+
+		h5 {
+			font-size:1.4rem;
+			padding:30px 15px 20px 15px;
+		}
+
+		.message-title span {
+			font-size:1rem;
+			padding-bottom:10px;
+		}
+
+		#messages, .message-scientists-header {
+			max-width:960px;
+			margin:0 auto;
+		}
+
+		.message-scientists-header {
+			color:#FF7648;
+			font-size:1.8rem;
+			font-weight:700;
+			line-height:2.0rem;
+		}
+	</style>
+
+	<script>
+		function load_messages () {
+			function message_listener () {
+				var fetched_rss = JSON.parse(this.responseText)
+				var messages = doc.get_id("messages")
+
+				fetched_rss.items.forEach(function(item){
+					item.pubDate = item.pubDate.split(" ")[0]
+				})
+
+				doc.clear_and_replace(fetched_rss.items, messages, doc.get_id("message-template"))
+			}
+			
+			var req = new XMLHttpRequest();
+			req.addEventListener("load", message_listener);
+			req.open("GET", "https://api.rss2json.com/v1/api.json?rss_url=http://medium.com/feed/@kidtalkscrapbook");
+			req.send();
+		}
+	</script>
+
+</message-scientists>

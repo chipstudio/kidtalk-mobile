@@ -1,0 +1,250 @@
+<icon-searcher definition>
+
+	<template>
+		<b>Icons</b>
+        <div id="iconsaver"></div>
+        <div id="searcher" onclick="show_search()">
+        	<div id="search-icon">+</div>
+			<input onkeyup="search_icons(this.value, true)" class="search-icons" id="search-icons" show="false">
+		</div>
+		<div id="icons"></div>
+	</template>
+
+	<style>
+		#searcher {
+			border-radius:16px;
+			border:2px solid #000;
+			display:inline-block;
+			margin-right:5px;
+			vertical-align:top;
+			margin-bottom:5px;
+		}
+
+		#search-icon {
+			height:60px;
+			line-height:60px;
+			text-align:center;
+			font-weight:700;
+			width:60px;
+		}
+
+		#search-icon[show="false"], 
+		#search-icons[show="false"] {
+			display:none;
+		}
+
+		#search-icons {
+			height:40px;
+			width:120px;
+			border-width:0;
+			padding:10px;
+			font-size:1.4rem;
+			line-height:40px;
+			border-radius:16px;
+		}
+/*		#searcher {
+			border:1px solid #000;
+			display:inline-block;
+			line-height:60px;
+			text-align:center;
+			font-size:20px;
+			font-weight:600;
+			margin:5px;
+			border-radius:16px;
+			padding:5px;
+			vertical-align:top;
+		}
+
+		#icons {
+			display:inline;
+		}*/
+
+		#icons {
+			display:inline;
+			vertical-align:top;
+		}
+
+/*		.search-icons {
+			box-sizing:border-box;
+			border-radius:16px;
+			border:1px solid #000;
+			margin:5px;
+			height:60px;
+			display:inline;
+			line-height:60px;
+			vertical-align:middle;
+			width:120px;
+		}*/
+
+/*		.search-icons {
+			border:2px solid #000;
+			font-size:16px;
+			border-radius:16px;
+			padding:5px;
+			margin:5px;
+			max-height:100px;
+			border-radius:16px;
+		}*/
+
+		.transcription-icon {
+			border:2px solid transparent;
+			border-radius:16px;
+			margin-right:10px;
+			margin-bottom:5px;
+			display:inline-block;
+			padding:5px;
+			font-size:50px;
+		}
+
+		.transcription-icon[icon-selected="true"] {
+			border:2px solid #000;
+			padding:5px;
+			font-size:50px;
+		}
+	</style>
+
+	<script>
+		function render_icon (icon_name, pre_selected) {
+			if (pre_selected != true) {
+				pre_selected = false
+			}
+
+			return doc.create_el("div", {
+				className: "fas fa-" + icon_name + " transcription-icon",
+				"icon-name": icon_name,
+				onclick: "select_icon(this)",
+				"icon-selected": pre_selected
+			})
+		}
+
+		function select_icon (icon_el) {
+			var is_selected = icon_el.getAttribute("icon-selected") == "true"
+			console.log(is_selected)
+			icon_el.setAttribute("icon-selected", !is_selected)
+		}
+
+		function search_icons (value, append_icons) {
+			if (append_icons != true) {
+				append_icons = false
+			}
+			var icons_el = doc.get_id("icons")
+			var exact_match = null
+			var first_match = null
+			
+
+			var selected_icons = Array.from(icons_el.querySelectorAll("div[icon-selected=true]"))
+			
+			var icon_saver = doc.get_id("iconsaver")
+			var preselected_str = " "
+			selected_icons.forEach(function(selected_icon) {
+				preselected_str = preselected_str + " " + selected_icon.getAttribute("icon-name") + " "
+				icon_saver.appendChild(selected_icon)
+			})
+
+			icons_el.innerHTML = ""
+			var saved_icons = Array.from(icon_saver.querySelectorAll("div[icon-selected=true]"))
+
+			saved_icons.forEach(function(saved_icon) {
+				icons_el.appendChild(saved_icon)
+			})
+
+			if (value == "") {
+				return
+			}
+
+			font_awesome.solid.forEach(function(font){
+				if (first_match == null) {
+					first_match = font
+				}
+
+				var search_val = value.toLowerCase()
+				search_val.split(" ").forEach(function(part_of_search_val) {
+					if (part_of_search_val != "" && part_of_search_val != undefined &&
+						part_of_search_val != "with" && part_of_search_val != "i" && 
+						part_of_search_val != "to" && part_of_search_val != "and" &&
+						part_of_search_val != "a") {
+						if(font.indexOf(part_of_search_val) != -1) {
+							if (append_icons == true) {
+								if (preselected_str.indexOf((" " + font + " ")) == -1) {
+									if (icons_el.childElementCount < 35) {
+										icons_el.appendChild(render_icon(font))
+									}
+								}
+							}
+
+							if (search_val == font) {
+								exact_match = font
+							}
+						} else {
+							/* Plurals */
+							try {
+								if (part_of_search_val[part_of_search_val.length - 1] == "s") {
+									if(font.indexOf(part_of_search_val.slice(0, -1)) != -1) {
+										if (append_icons == true) {
+											if (preselected_str.indexOf((" " + font + " ")) == -1) {
+												if (icons_el.childElementCount < 35) {
+													icons_el.appendChild(render_icon(font))
+												}
+											}
+										}
+
+										if (search_val == font) {
+											exact_match = font
+										}
+									}
+								}
+							} catch {}
+						}
+					}
+				})
+			})
+
+			if (exact_match != null) {
+				return exact_match
+			}
+		}
+
+		function render_icon_array () {
+
+		}
+
+		function show_search () {
+			doc.get_id("search-icons").setAttribute("show", true)
+			doc.get_id("search-icon").setAttribute("show", false)
+			doc.get_id("search-icons").focus()
+		}
+
+		function hide_search () {
+			doc.get_id("search-icons").setAttribute("show", false)
+			doc.get_id("search-icon").setAttribute("show", true)
+		}
+
+		function extract_icons_from_string (string) {
+			var icons = []
+			string.split(" ").forEach(function(word){
+				var search_result = search_icons(word)
+				if (search_result != null) {
+					icons.push(search_result)
+				}
+			})
+
+			var icons_el = doc.get_id("icons")
+			icons_el.innerHTML = ""
+			icons.forEach(function (icon) {
+				icons_el.appendChild(render_icon(icon, true))
+			})
+		}
+
+		function simple_search_icons (value) {
+			var html_icons = [];
+			font_awesome.solid.forEach(function(font){
+				var search_val = value.toLowerCase()
+				if(font.indexOf(search_val) != -1) {
+					html_icons.push(render_icon(font));
+				}
+			})
+			return html_icons;
+		}
+	</script>
+
+</icon-searcher>

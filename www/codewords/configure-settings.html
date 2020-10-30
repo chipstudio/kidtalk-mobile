@@ -1,0 +1,470 @@
+<configure-settings definition>
+    
+    <template>
+        <div class="settings-container">
+            <template id="avatar-widget">
+                <div class="avatar-widget">
+                    <img src="{{avatar_url}}">
+                    <div  class="button" onclick="select_user_avatar(this)" avatar-number="{{parent_avatar}}" user-id="{{id}}">Select Avatar</div>
+                </div>
+            </template>
+
+            <div id="avatar-selection">
+            </div>
+
+            <form id="settings-form" onsubmit="configure_settings(event)">
+                <div class="configure my-profile">
+                    <div class="configure-title">My Profile</div>
+                    <label for="my_name">Nickname:</label>
+                    <input type="text" 
+                        name="my_name" placeholder="Enter Nickname" id="my_name">
+                    <br/>
+                    <label for="zipcode">U.S. Zip Code:</label>
+                    <input type="text" 
+                        name="zipcode" placeholder="Enter Zip Code" id="zipcode">
+                    <br/>
+                    <label for="race_ethnicity">Race / Ethnicity:</label>
+                    <input type="text" 
+                        name="race_ethnicity" placeholder="Enter Race or Ethnicity" id="race_ethnicity">
+                </div>
+                <div class="minor-breaking-line"></div>
+
+                <div class="configure sharing-and-zip">
+                    <div class="sharing-settings">
+                        <div class="configure-title">Sharing with Researchers</div>
+                        <div class="sharing-checkboxes">
+                            <label class="custom-checkbox-container">
+                                <input type="checkbox" name="share_audio_research_dbs" id="share_audio_research_dbs">
+                                <span class="custom-checkmark"></span>
+                                <label for="share_audio_research_dbs">Share audio recordings</label>
+                            </label>
+                            <span class="more-info" onclick="show_more_info(event)" data-text=
+                                "Anonymous audio recordings of me and my child's conversation
+                                to be shared with research databases.">?</span><br/>
+
+                            <label class="custom-checkbox-container">
+                                <input type="checkbox" name="share_transcript_research_dbs" id="share_transcript_research_dbs">
+                                <span class="custom-checkmark"></span>
+                                <label for="share_transcript_research_dbs">Share audio transcripts</label>
+                            </label>
+                            <span class="more-info" onclick="show_more_info(event)" data-text=
+                                "Anonymous transcripts of me and my child's conversation to be
+                                shared with publicly available research databases.">?</span><br/>
+
+                            <label class="custom-checkbox-container">
+                                <input type="checkbox" name="share_audio_guess_the_word" id="share_audio_guess_the_word">
+                                <span class="custom-checkmark"></span>
+                                <label for="share_audio_guess_the_word">Use audio in guessing game</label>
+                            </label>
+                            <span class="more-info" onclick="show_more_info(event)" data-text=
+                                "Anonymous audio recordings of my child’s speech to be used
+                                in this app’s “Say What?” game.">?</span><br/>
+
+                            <label class="custom-checkbox-container">
+                                <input type="checkbox" name="share_survey_research_dbs" id="share_survey_research_dbs">
+                                <span class="custom-checkmark"></span>
+                                <label for="share_survey_research_dbs">Share survey responses</label>
+                            </label>
+                            <span class="more-info" onclick="show_more_info(event)" data-text=
+                                "Anonymous responses to surveys about my family to be shared
+                                with other researchers.">?</span><br/>
+                        </div>
+                    </div>
+                </div>
+                <input type="submit" id="save_settings" name="save_settings" value="Save Settings">
+                <div id="saved_settings_successfully">
+                    <div class="success-checkmark-symbol">&#10003;</div>
+                    <div class="success-save-message">Settings Saved Successfully!</div>
+                </div>
+            </form>
+        </div>
+    </template>
+    
+    <style>
+        .avatar-widget {
+            padding-bottom:30px;
+            text-align:center;
+        }
+
+        .avatar-widget img {
+            display:inline-block;
+            height:50px;
+            vertical-align:middle;
+            width:50px;
+        }
+
+        .avatar-widget img[src="null"] {
+            display:none;
+        }
+
+        .avatar-widget .button {
+            display:inline-block;
+            margin-top:0;
+            margin-left:20px;
+            vertical-align:middle;
+        }
+
+        .configure-title {
+            color:#FF7648;
+            font-size:24px;
+            font-weight:700;
+            margin:20px;
+        }
+        .configure {
+            margin-bottom:40px;
+        }
+        input[type="submit"][name="save_settings"] {
+            background:#FF7648;
+            border:none;
+            border-radius:10px;
+            bottom:0;
+            color:white;
+            cursor:pointer;
+            font-size:1.0rem;
+            font-weight:700;
+            height:3.5rem;
+            margin-top:20px;
+            opacity:1;
+            outline:none;
+            padding:12px 15px;
+            text-transform:uppercase;
+            width:100%;
+        }
+        input[type="submit"][name="save_settings"].hide {
+            display:none;
+            opacity:0;
+        }
+        input[name="zipcode"],
+        input[name="my_name"],
+        input[name="race_ethnicity"] {
+            border:2px solid black;
+            border-radius:3px;
+            font-size:1.2rem;
+            font-weight:700;
+            line-height:1.8rem;
+            margin-left:2px;
+            margin-top:10px;
+            padding:10px;
+            width:calc(100% - 30px);
+        }
+        label {
+            font-weight:700;
+        }
+        label[for="zipcode"],
+        label[for="my_name"],
+        label[for="race_ethnicity"] {
+            display:block;
+            font-size:1.2rem;
+        }
+        label[for="zipcode"],
+        label[for="race_ethnicity"] {
+            margin-top:20px;
+        }
+        .minor-breaking-line {
+            margin-top:3.0rem;
+        }
+        .more-info {
+            background:#6E7FC8;
+            border-radius:50%;
+            color:white;
+            display:inline-block;
+            font-size:14px;
+            height:18px;
+            line-height:18px;
+            margin-left:2px;
+            text-align:center;
+            width:18px;
+        }
+        .settings-container {
+            color:black;
+            max-width:360px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        #settings-form {
+            text-align:center;
+        }
+        .sharing-and-zip {
+            margin-bottom:20px;
+        }
+        .sharing-checkboxes {
+            font-size:1.1rem;
+            line-height:30px;
+            max-width:320px;
+            margin:0 auto;
+            text-align:left;
+            width: 100%;
+        }
+        .sharing-settings .configure-title {
+            font-weight:700;
+            text-align:center;
+        }
+
+        /* Custom Checkmarks Styles */
+        .custom-checkbox-container {
+            display: inline-block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .custom-checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .custom-checkmark {
+            border-radius:3px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 1.4rem;
+            width: 1.4rem;
+            background-color: #eee;
+        }
+        .custom-checkbox-container:hover input ~ .custom-checkmark {
+            background-color: #ccc;
+        }
+        .custom-checkbox-container input:checked ~ .custom-checkmark {
+            background-color: #6E7FC8;
+        }
+        .custom-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-checkbox-container input:checked ~ .custom-checkmark:after {
+            display: block;
+        }
+        .custom-checkbox-container .custom-checkmark:after {
+            left: 0.45rem;
+            top: 0.1rem;
+            width: 0.4rem;
+            height: 0.75rem;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        /* Success Feedback */
+        #saved_settings_successfully {
+            color:#4BB543;
+            display:none;
+            font-size:1.2rem;
+            font-weight:700;
+            margin:3.6rem auto;
+            transition:opacity 400ms linear;
+        }
+        #saved_settings_successfully.show {
+            display:block;
+        }
+        #saved_settings_successfully .success-checkmark-symbol,
+        #saved_settings_successfully .success-save-message {
+            display:inline-block;
+            vertical-align:top;
+
+        }
+        #saved_settings_successfully .success-checkmark-symbol {
+            background:#4BB543;
+            border-radius:50%;
+            bottom:0.1rem;
+            color:white;
+            font-weight:700;
+            height:1.4rem;
+            line-height:1.4rem;
+            margin-right:0.4rem;
+            overflow:hidden;
+            position:relative;
+            text-align:center;
+            width:1.4rem;
+        }
+    </style>
+
+    <script>
+        /* Global Variables */
+        var user_subscription = null;
+        var kid_subscription = null;
+
+        var user = null;
+        var user_family = null;
+        var user_family_members = null;
+
+        function fill_checkbox (user, checkbox_name) {
+            if (user.hasOwnProperty(checkbox_name) == true) {
+                doc.get_id(checkbox_name).checked = user[checkbox_name]
+            }
+        }
+        
+        function load_settings (user_id) {
+            /* Grab the logged in user id */
+            /* Load Sharing and Location Settings */
+            data.get_model_id("User", user_id).then(function(model){
+                user = model;
+                user.id = user_id
+
+                fill_checkbox(user, "share_audio_research_dbs")
+                fill_checkbox(user, "share_transcript_research_dbs")
+                fill_checkbox(user, "share_audio_guess_the_word")
+                fill_checkbox(user, "share_survey_research_dbs")
+
+                /* Show Saved First Name on DOM */
+                if (user.hasOwnProperty("zipcode")) {
+                    doc.get_id("my_name").value = user.first_name
+                }
+
+                /* Show Saved Zip Code on DOM */
+                if (user.hasOwnProperty("zipcode")) {
+                    doc.get_id("zipcode").value = user.zipcode
+                }
+
+                /* Show Race Ethnicity Field on DOM */
+                if (user.hasOwnProperty("race_ethnicity")) {
+                    doc.get_id("race_ethnicity").value = user.race_ethnicity
+                }
+
+                if (user.hasOwnProperty("parent_avatar")) {
+                    window.user_avatar = user.parent_avatar
+                    user.avatar_url = "/images/SVG/Avatars/parent/" + user.parent_avatar + ".svg"
+                } else {
+                    user.parent_avatar = ""
+                    user.avatar_url = "null"
+                }
+
+                var rendered_widget = doc.render(doc.get_id("avatar-widget"), user)
+                doc.get_id("avatar-selection").innerHTML = ""
+                doc.get_id("avatar-selection").appendChild(rendered_widget)
+            }).catch(function(error) {
+                console.log(error);
+            })
+        }
+
+        function select_user_avatar (button) {
+            var prefills = {
+                id: button.getAttribute("user-id") }
+
+            var avatar_number = parseInt(button.getAttribute("avatar-number"))
+            if (isNaN(avatar_number) == true) {
+                prefills.parent_avatar = avatar_number }
+            
+            doc.create_model_modal("User", prefills, [
+                'email', 'first_name', 'last_saw_survey', 'race_ethnicity', 
+                'id', 'verified', 'has_initialed', 'share_audio_research_dbs',
+                'share_transcript_research_dbs', 'share_audio_guess_the_word',
+                'share_survey_research_dbs', 'zipcode', 'last_version_seen'
+            ])
+        }
+
+        /* Configure Settings */
+        function configure_settings (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var settings_data = doc.serialize(event.target);
+
+            /* Set up settings to save to User */
+            var my_settings = {
+                email: user.email,
+                first_name: settings_data.my_name,
+                race_ethnicity: settings_data.race_ethnicity,
+                share_audio_research_dbs: settings_data.share_audio_research_dbs,
+                share_transcript_research_dbs: settings_data.share_transcript_research_dbs,
+                share_audio_guess_the_word: settings_data.share_audio_guess_the_word,
+                share_survey_research_dbs: settings_data.share_survey_research_dbs,
+                zipcode: settings_data.zipcode
+            };
+
+            save_sharing_settings(my_settings);
+        }
+
+        /* Save Sharing Settings */
+        function save_sharing_settings (sharing_settings) {
+            var save_button = doc.get_id('save_settings');
+            var save_message = doc.get_id('saved_settings_successfully');
+            
+            /* Smooth out visual feedback */
+            save_message.style.opacity = 0;
+            save_message.className = 'show';
+            save_button.className = 'hide';
+
+            /* Get Form Data Ready To Send Save to DB */
+            var updated_user_obj = sharing_settings;
+            if (sharing_settings.share_audio_research_dbs == undefined) { 
+                sharing_settings.share_audio_research_dbs = false; }
+            if (sharing_settings.share_transcript_research_dbs == undefined) { 
+                sharing_settings.share_transcript_research_dbs = false; }
+            if (sharing_settings.share_audio_guess_the_word == undefined) { 
+                sharing_settings.share_audio_guess_the_word = false; }
+            if (sharing_settings.share_survey_research_dbs == undefined) { 
+                sharing_settings.share_survey_research_dbs = false; }
+
+            /* Update Model */
+            data.update_model("User", window.user_id, updated_user_obj)
+                .then(function(updated_model) {
+
+                /* On Success, Show Saved Message */
+                var save_button = doc.get_id('save_settings');
+                var save_message = doc.get_id('saved_settings_successfully');
+                
+                save_message.style.opacity = 1;
+                save_message.className = 'show';
+                save_button.className = 'hide';
+                db.collection('TaggedAdult').where('email', '==', updated_user_obj.email).get().then((query) => {  
+                    query.docs.forEach((tag)=>{
+                        tag.ref.update({first_name:updated_user_obj.first_name});
+                    })
+                });
+
+                db.collection('Invitation').where('email', '==', updated_user_obj.email).get().then((query) => {  
+                    query.docs.forEach((tag)=>{
+                        tag.ref.update({name:updated_user_obj.first_name});
+                    })
+                });
+
+                /* Once seen, Fade In Save Button Again */
+                setTimeout (function() {
+                    save_message.className = '';
+                    save_button.className = '';
+                    if (window.user.last_version_seen != window.currentVersion && window.user.has_initialed == true){
+                        doc.navigate("/update");
+                    }else{
+                        doc.navigate("/home")
+                    }
+                }, 2000)
+            }).catch(function (error) {
+
+                /* Error Handling */
+                var error_msg = 'There was an issue saving your settings. You are not required to enter a zipcode, but if you do please check that it is a valid, 5 digit zipcode. All fields are optional. If you choose to not to fill out a field, please leave it blank. If the problem persists, please contact support.';
+                alert(error_msg);
+
+                /* Reset Save Button and Message */
+                doc.get_id('saved_settings_successfully').className = '';
+                doc.get_id('save_settings').className = '';
+            })
+        }
+
+        /* Linebreak Helper Function */
+        function remove_linebreaks (_string) {
+            return _string
+                .replace(/   /g,"")
+                .replace(/(\r\n|\n|\r)/gm,"")
+                .replace("  ", " ");
+        }
+
+        /* Show More Info for Sharing Setting */
+        function show_more_info (event) {
+            var full_text = "Checking this box is optional and may be changed " + 
+                "at any time. By checking this box, you agree to allow: \n\n";
+            full_text += remove_linebreaks(event.target.getAttribute('data-text'));
+            alert(full_text);
+        }
+    </script>
+
+</configure-settings>

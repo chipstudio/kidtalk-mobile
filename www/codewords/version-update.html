@@ -1,0 +1,75 @@
+<version-update definition>
+	<template>
+		<div class="new-version-container">
+			<div class="new-version-header">Welcome to KidTalk 2.0. Click below to learn how it works!</div>
+			<img src="/images/SVG/Logo/KidTalk_Logo.svg" class="home-logo">
+			<div class="version-title"></div>
+			<div class="update-content"></div>
+			<br><br><br>
+			<button class="version-button"><a href="https://medium.com/@kidtalkscrapbook/august2020updates-5c57918640a0" target="_blank">Learn More About New Version</a></button>
+			<br>
+			</br>
+			<button class="version-button confirm" id="read">Back to App</button>
+		</div>
+	</template>
+
+	<script type="text/javascript">
+		function loadUpdate() {
+			var read = document.getElementById("read");
+			read.addEventListener("click", conform_update);
+		}
+
+		function conform_update() {
+			var userRef = db.collection("User").doc(window.user_id)
+                    userRef.update({
+                        last_version_seen: window.currentVersion
+                    }).then(function() {
+                        console.log("confirmed update, last_version_seen updated to", window.currentVersion);
+                    }).catch(function(error) {
+                          console.error(error);
+					});
+					doc.navigate("/home")
+		}
+	</script>
+	<style>
+		div.new-version-container {
+			color: black;
+			text-align: center;
+			max-width: 360px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		div.new-version-header {
+			color:#FF7648;
+			font-size:1.6rem;
+			font-weight:700;
+			line-height:1.8rem;
+			margin:2.0rem auto;
+		}
+		button.version-button {
+			background: #FF7648;
+			border: none;
+			border-radius: 10px;
+			box-sizing: border-box;
+			color: white;
+			font-weight: 700;
+			font-size: 1.0rem;
+			line-height: 2.0rem;
+			outline: none;
+			padding: 10px;
+			width: 100%;
+		}
+
+		button.version-button:hover {
+			cursor: pointer;
+		}
+
+		.version-button a,
+		.version-button a:link,
+		.version-button a:visited,
+		.version-button a:hover {
+			text-decoration: none;
+			color: white;
+		}
+	</style>
+	</version-update>

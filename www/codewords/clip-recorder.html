@@ -1,0 +1,1414 @@
+<clip-recorder definition>
+  <template>
+    <div id="media" mode="none" played="false">
+      <div id="processing-convo">
+        <img src="/images/loader.gif" /><br />
+        <span>Processing uploaded file! <br />Please wait... </span>
+      </div>
+
+      <div id="stop_instructions" class="instructions">
+        Great! Now say anything, and press STOP when you're done.
+      </div>
+
+      <div id="elicit_instructions" class="instructions">
+        Great! Now speak with your child about the following image:
+      </div>
+
+      <div id="transcribe_instructions" class="instructions">
+        Now let's play back the conversation.
+      </div>
+
+      <div id="pause_instructions" class="instructions">
+        Perfect! You can tag people and add a description below at any time.
+      </div>
+
+      <div id="record_button" class="media-button">
+        <h2>Record Conversation</h2>
+        <record-icon></record-icon>
+
+        <div class="button" onclick="start_conversation()">
+          Prompt Me!
+        </div>
+
+        <div class="select-video-container">
+          Upload
+          <input
+            class="select-video"
+            type="file"
+            accept="video/mp4,video/x-m4v,video/*"
+            onchange="go();"
+            id="select_wav"
+          />
+        </div>
+
+      </div>
+
+      <div id="stop_button" class="media-button" onclick="stop_recording()">
+        <stop-icon></stop-icon>
+        <span>Stop</span>
+      </div>
+
+      <div id="play_button" class="media-button" onclick="play_recording()">
+        <play-icon></play-icon>
+        <span>Play</span>
+      </div>
+
+      <div id="converter" class="media-button">
+        <img src="/images/loader.gif" /><br />
+        <span>Converting! Please wait...</span>
+      </div>
+
+      <div id="pause_button" class="media-button" onclick="pause_recording()">
+        <pause-icon></pause-icon>
+        <span>Pause</span>
+      </div>
+
+      <div class="waveform-container">
+        <input type="range" min="0" max="100" value="0" step="1" id="start-crop" oninput="crop_start(this.value)" />
+
+        <div class="crop start" id="cropstart"></div>
+
+        <div class="eq-container">
+          <div id="current-time"></div>
+          <canvas id="eq" height="100px"></canvas>
+          <div class="limited-waveform">
+            This file type has limited preview support.
+          </div>
+        </div>
+
+        <div class="crop end" id="cropend"></div>
+
+        <input type="range" min="0" max="100" value="100" step="1" id="end-crop" oninput="crop_end(this.value)" />
+      </div>
+
+      <div id="elicit_instructions" class="instructions">
+        <img id="elicited-convo" />
+      </div>
+
+      <div class="transcribe-step">
+        <template id="tag-kid-template">
+          <div class="tagged-kid">
+            <label class="custom-checkbox-container">
+              <div class="recording-icon" style="background-image:url('/images/SVG/Avatars/kid/{{kid_avatar}}.svg'), url('/images/SVG/Avatars/missing_avatar.svg');"></div>
+              <input type="checkbox" name="{{id}}" value="{{id}}" />
+              <span class="custom-checkmark"></span>
+              <label for="{{id}}">{{first_name}}</label>
+            </label>
+          </div>
+        </template>
+        <template id="tag-adult-template">
+          <div class="tagged-adult">
+            <label class="custom-checkbox-container">
+              <div class="recording-icon" style="background-image:url('/images/SVG/Avatars/parent/{{parent_avatar}}.svg'), url('/images/SVG/Avatars/missing_avatar.svg');"></div>
+              <input type="checkbox" name="{{id}}" value="{{id}}" />
+              <span class="custom-checkmark"></span>
+              <label for="{{id}}">{{first_name}}</label>
+            </label>
+          </div>
+        </template>
+        <form class="tag-kids">
+          <div id="tag-kids"></div>
+          <div id="tag-adults"></div>
+
+          <b id="description-instructions"
+            >Describe this conversation with a few words:</b
+          >
+          <textarea
+            name="description"
+            spellcheck="false"
+            autocapitalize="off"
+            autocorrect="off"
+            onkeyup="search_icons(this.value, true)"
+          ></textarea>
+
+          <b id="transcription-instructions"
+            >Provide a transcription of this snippet:</b
+          >
+          <textarea
+            name="transcription"
+            spellcheck="false"
+            autocapitalize="off"
+            autocorrect="off"
+            onkeyup="search_icons(this.value, true)"
+          ></textarea>
+
+          <icon-searcher></icon-searcher>
+
+          <br /><br />
+
+          <div id="custom-date-container">
+            <b>Date (Optional)</b>
+            <input
+              id="custom-date-field"
+              type="date"
+              name="custom-date"
+              class="custom-date"
+            />
+          </div>
+
+          <label class="custom-checkbox-container">
+            <input type="checkbox" name="private" value="private" />
+            <span class="custom-checkmark"></span>
+            <label for="private">Mark recording as private?</label>
+          </label>
+        </form>
+
+        <div id="clips"></div>
+
+        <div
+          class="button"
+          onclick="submit_transcription(this)"
+          id="submit-button"
+        >
+          SUBMIT CONVERSATION
+        </div>
+        <div
+          class="button"
+          onclick="submit_transcription(this, true)"
+          id="extract-button"
+          show="false"
+        >
+          EXTRACT CLIP
+        </div>
+        <div
+          class="button white discard-audio"
+          onclick="discard_audio()"
+          style="background-color: red;"
+        >
+        </div>
+
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <audio id="player" controls ontimeupdate="update_current_time(event)"></audio>
+  </template>
+
+  <style>
+            .discard-audio {
+
+            }
+
+            .discard-audio:after {
+                content:'CLEAR CONVERSATION';
+            }
+            #elicited-convo {
+                display:none;
+            }
+
+            #elicited-convo {
+                margin-top:20px;
+            }
+
+            #media[mode="elicit"] .eq-container,
+            #media[mode="elicit"] .waveform-container {
+                margin-top:0;
+                margin-bottom:0;
+            }
+
+            #elicited-convo[show="true"] {
+                display:block;
+                height:auto;
+                margin:0 auto;
+                width:100%;
+            }
+
+            #custom-date-container {
+                display:none;
+            }
+
+            #custom-date-container.show {
+                display:block;
+            }
+
+            #record_button .button {
+                font-size:1.6rem;
+            }
+
+            #processing-convo {
+                display:none;
+            }
+
+            #media {
+                position:relative;
+            }
+
+            .select-video-container {
+                box-sizing:border-box;
+                position:relative;
+                padding:24px 32px;
+                font-size:1.6rem;
+                background-color:#FF7648;
+                color:#fff;
+                margin-top:15px;
+                font-weight:700;
+                border-radius:20px;
+            }
+
+            input.custom-date {
+                background-color:transparent;
+                border:2px solid #FF7648;
+                border-radius:16px;
+                font-size:1.4rem;
+                height:2.2rem;
+                padding:0.4rem;
+                margin-bottom:1.6rem;
+                width:calc(100% - 0.8rem - 5px);
+            }
+
+            input.select-video {
+                position:absolute;
+                left:0;
+                right:0;
+                top:0;
+                bottom:0;
+                opacity:0;
+                z-index:3;
+                cursor:pointer;
+            }
+
+            .tagged-kid,
+            .tagged-adult {
+                padding:10px 0;
+            }
+
+            .tagged-kid label,
+            .tagged-adult label {
+                font-size:1.3rem;
+            }
+
+            .tag-kids {
+                padding-top:10px;
+                text-align:left;
+
+            }
+
+            .tag-kids b {
+                font-weight:800;
+                font-size:1.4rem;
+                display:block;
+                padding:10px 0;
+            }
+
+            .tag-child {
+                padding:10px;
+                display:block;
+                text-align:left;
+            }
+
+            .child-name {
+                display:inline-block;
+                vertical-align:middle;
+            }
+
+            #current-time {
+                background-color:#000000;
+                top:0px;
+                position:absolute;
+                width:2px;
+                left:0;
+                transition:left .2s linear;
+                bottom:0;
+                visibility:hidden;
+            }
+
+                #current-time:after {
+                    color:#000;
+                    position:absolute;
+                    content:attr(current);
+                    left:4px;
+                    bottom:0;
+                    height:24px;
+                    line-height:24px;
+                    font-weight:700;
+                    font-size:1rem;
+                    width:24px;
+                    text-align:center;
+                }
+
+            .waveform-container {
+                margin:0 auto;
+                margin-top:55px;
+                position:relative;
+                width:100%;
+            }
+
+                .eq-container {
+                    /*border:2px solid rgba(200,200,200,1);*/
+                    /*border-radius:20px;*/
+                    position:relative;
+                    height:100px;
+                    margin-top:25px;
+                    margin-bottom:25px;
+                    /*overflow:hidden;*/
+                    z-index:3;
+                }
+
+                .limited-waveform {
+                    display:none;
+                }
+
+                #media[limited-waveform="true"] .limited-waveform {
+                    display:block;
+                    position:absolute;
+                    left:0;
+                    right:0;
+                    height:30px;
+                    line-height:30px;
+                    top:50%;
+                    margin-top:-15px;
+                    background-color:#FF7748;
+                    color:#fff;
+                    z-index:6;
+                }
+
+            .waveform-container input {
+                width:100%;
+            }
+
+                .waveform-container .crop {
+                    background-color:rgba(210,210,210,.8);
+                    position:absolute;
+                    top:45px;
+                    bottom:45px;
+                    width:0%;
+                    z-index:3;
+                }
+
+                .waveform-container .crop.start {
+                    left:0;
+                    visibility:hidden;
+                }
+
+                .waveform-container .crop.end {
+                    right:0;
+                    visibility:hidden;x
+                }
+
+                .waveform-container .crop.start:before {
+                    top:-90px;
+                    border-radius:50%;
+                    color:#000;
+                    font-weight:700;
+                    font-size:1.6rem;
+                    height:30px;
+                    width:100%;
+                    min-width:40px;
+                    line-height:30px;
+                    right:0px;
+                    left:0;
+                    content:attr(start);
+                    position:absolute;
+                    text-align:right;
+                }
+
+
+                .waveform-container .crop.end:before {
+                    border-radius:50%;
+                    bottom:-90px;
+                    color:#000;
+                    font-size:1.6rem;
+                    font-weight:700;
+                    line-height:30px;
+                    min-width:40px;
+                    height:30px;
+                    content:attr(end);
+                    position:absolute;
+                    text-align:left;
+                    width:100%;
+                    right:0px;
+                }
+
+
+            #media {
+                padding:10px;
+                padding-top:20px;
+                text-align:center;
+            }
+
+            #media[playback="true"] .button {
+                display:none;
+            }
+
+                .media-button {
+                    display:inline-block;
+                    font-weight:600;
+                    font-size:1.8rem;
+                    padding-top:30px;
+                    position:relative;
+                    text-align:center;
+                    vertical-align:middle;
+                }
+
+                    .media-button svg {
+                        font-size:.6rem;
+                        letter-spacing:1px;
+                        /*padding-top:45px;*/
+                        text-transform:uppercase;
+                    }
+
+                    .media-button svg {
+                        width:75px;
+                    }
+
+                    .media-button#record_button {
+                        max-width:240px;
+                        text-align:center;
+                    }
+
+                    .media-button#record_button svg {
+                        margin:0 auto;
+                    }
+
+                #media[mode='none'] #record_instructions,
+                #media[mode='recording'] #stop_instructions,
+                #media[mode='elicit'] #elicit_instructions,
+                #media[mode='pending'] #play_instructions,
+                #media[mode='playing'] #pause_instructions,
+                #media[mode='paused'] #play_instructions {
+                    display:block;
+                }
+
+                #media[mode='none'] #record_button,
+                #media[mode='recording'] #stop_button,
+                #media[mode='elicit'] #stop_button,
+                #media[mode='pending'] #play_button,
+                #media[mode='playing'] #pause_button,
+                #media[mode='paused'] #play_button {
+                    display:inline-block;
+                }
+
+                #media[mode="pending"] .waveform-container .crop.start:after,
+                #media[mode="pending"] .waveform-container .crop.end:after,
+                #media[mode="pending"] #current-time,
+                #media[mode="playing"] #current-time,
+                #media[mode="paused"] #current-time {
+                    visibility:visible;
+                }
+
+                #media[mode="pending"] .waveform-container .crop.start,
+                #media[mode="pending"] .waveform-container .crop.end,
+                #media[mode="playing"] .waveform-container .crop.start,
+                #media[mode="playing"] .waveform-container .crop.end,
+                #media[mode="paused"] .waveform-container .crop.start,
+                #media[mode="paused"] .waveform-container .crop.end {
+                    visibility:visible;
+                }
+
+
+
+                #media[mode="recording"] textarea[name="description"],
+                #media[mode="pending"] textarea[name="description"],
+                #media[mode="playing"] textarea[name="description"],
+                #media[mode="recording"] #description-instructions,
+                #media[mode="pending"] #description-instructions,
+                #media[mode="playing"] #description-instructions {
+                    display:block;
+                }
+
+                #media textarea[name="description"],
+                #media textarea[name="transcription"],
+                #media #description-instructions,
+                #media #transcription-instructions {
+                    display:none;
+                }
+
+                #media input[type='range'] {
+                    visibility:hidden;
+                }
+
+                #extract-button {
+                    display:none;
+                }
+
+                #media[snippeting="true"] input[type='range'] {
+                    visibility:visible;
+                }
+
+                #media[snippeting="true"] .instructions {
+                    display:none !important;
+                }
+
+                #media[snippeting="true"] .discard-audio:after {
+                    content:'CANCEL';
+                }
+
+                #media[snippeting="true"] textarea[name="transcription"],
+                #media[snippeting="true"] #transcription-instructions,
+                #media[snippeting="true"] #extract-button {
+                    display:block;
+                }
+
+                #media[snippeting="true"] textarea[name="description"],
+                #media[snippeting="true"] #description-instructions,
+                #media[snippeting="true"] #submit-button {
+                    display:none;
+                }
+
+                #media {
+                    text-align:center;
+                }
+
+                .media-button {
+                    display:none;
+                    max-width:75px;
+                    text-align:center;
+                }
+
+                    .media-button svg {
+                        display:block;
+                    }
+
+                .instructions {
+                    display:none;
+                    font-weight:700;
+                    line-height:1.4em;
+                    font-size:1.4rem;
+                    margin:0 auto;
+                }
+
+                #media[mode='none'] #stop_button,
+                #media[mode='none'] #play_button,
+                #media[mode='none'] #pause_button,
+                #media .transcribe-step {
+                    display:none;
+                    margin:0 auto;
+                    max-width:400px;
+                }
+
+                #media[loading="true"] .waveform-container .crop.start:before,
+                #media[loading="true"] .waveform-container .crop.end:before {
+                    content:'';
+                }
+
+                #media[loading="true"] #play_button {
+                    display:none !important;
+                }
+
+                #media[loading="true"] #converter {
+                    display:inline-block;
+                    text-align:center;
+                    line-height:1em;
+                    max-width:none;
+                }
+
+                #media[loading="true"] #converter img {
+                    height:auto;
+                    width:100px;
+                }
+
+                #media[mode='pending'] #transcribe_instructions,
+                #media[played="true"] .transcribe-step {
+                    display:block;
+                }
+
+                    .transcribe-step .tag-kids {
+                        margin-top:40px;
+                    }
+
+                    .transcribe-step.first {
+                        font-weight:600;
+                    }
+
+                    .transcribe-step textarea {
+                        border:2px solid #FF7648;
+                        border-radius:16px;
+                        font-size:1.1rem;
+                        box-sizing:border-box;
+                        font-family:"proxima-soft";
+                        height:50px;
+                        padding:10px;
+                        resize:none;
+                        width:100%;
+                    }
+
+                    .button {
+                        border-radius:20px;
+                        background-color:#FF7648;
+                        color:#fff;
+                        font-size:1.4rem;
+                        font-weight:700;
+                        margin-top:20px;
+                        padding:24px 32px;
+                        cursor:pointer;
+                        position:relative;
+                    }
+
+                    #progress {
+                        padding-top:20px;
+                        display:none;
+                    }
+
+                    .button[disabled="true"] {
+                        background-color:#FFD7C9;
+                        color:transparent;
+                    }
+
+                    .button[disabled="true"]:after {
+                        color:#000;
+                        position:absolute;
+                        content:attr(progress);
+                        left:0;
+                        right:0;
+                        top:50%;
+                        margin-top:-10px;
+                        height:20px;
+                        line-height:20px;
+                        text-align:center;
+                    }
+
+    /*                .button[disabled="true"] + .button + #progress {
+                        display:block;
+                    }*/
+
+            #player {
+                display:none;
+            }
+
+            #eq {
+                display:block;
+                margin:0 auto;
+                /*margin-top:60px;*/
+            }
+
+            .arrow-down {
+                margin-right:-8px !important;
+            }
+  </style>
+
+  <script>
+    window.ac;
+    window.mic;
+    window.player;
+    window.stream;
+    window.eq_animator;
+    window.all_points = [];
+
+    window.eq_height = 100;
+    window.eq_width;
+
+    function log_time(audio) {
+      // var seconds = audio.currentTime
+      // var total = audio.duration
+      // doc.get_id("current-time").style.left = (seconds / total * 100) + "%"
+      // doc.get_id("current-time").setAttribute("duration", total)
+      // doc.get_id("current-time").setAttribute("current", seconds.toFixed(1))
+      // var calculated_start = $("#start-crop").val() / 100 * window.player.duration
+      // var calculated_end = $("#end-crop").val() / 100 * window.player.duration
+      // var start = (Math.floor(calculated_start * 10) / 10).toFixed(1)
+      // var end = (Math.ceil(calculated_end * 10) / 10).toFixed(1)
+      // doc.get_id("cropstart").setAttribute("start", start)
+      // doc.get_id("cropend").setAttribute("end", end)
+      // if (audio.currentTime > end) {
+      // pause_recording()
+      // audio.currentTime = end
+      // }
+    }
+
+    function update_recording_mode(new_mode) {
+      doc.get_id("media").setAttribute("mode", new_mode);
+    }
+
+    function initialize_audio() {
+      window.player = doc.get_id("player");
+      window.player.addEventListener("ended", function (e) {
+        update_recording_mode("pending");
+        window.cancelAnimationFrame(window.eq_animator);
+        draw_waveform();
+        window.played = false;
+        var calculated_start = $("#start-crop").val() / 100 * window.player.duration
+        var start = (Math.floor(calculated_start * 10) / 10).toFixed(1)
+        doc.get_id("cropstart").setAttribute("start", start)
+        window.player.currentTime = start
+      });
+    }
+
+    function start_recording(mode) {
+      /*  Request user microphone access, and store references
+            to the stream and audio context for parsing. */
+      if (!window.ac) {
+        window.ac = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      doc.get_id("media").removeAttribute("snippeting")
+
+      if (!mode) {
+        mode = "recording";
+      }
+
+      if (navigator.mediaDevices) {
+        navigator.mediaDevices
+          .getUserMedia({
+            audio: true,
+          })
+          .then(function (stream) {
+            window.stream = stream;
+
+            render_live_waveform();
+            update_recording_mode(mode);
+
+            window.mic = new MediaRecorder(stream);
+            window.mic.addEventListener("dataavailable", function (e) {
+              window.updated_src = URL.createObjectURL(e.data);
+              window.player.src = window.updated_src;
+              window.file = e.data;
+            });
+            window.start_time = new Date().getTime()
+            window.mic.start();
+          })
+          .catch(function (error) {
+                window.location.reload();
+          });
+      }
+
+      doc.get_id("custom-date-container").className = "";
+      doc.get_id("media").setAttribute("playback", false);
+
+      doc.get_id("media").setAttribute("limited-waveform", false);
+    }
+
+    function discard_audio() {
+      window.cancelAnimationFrame(window.eq_animator);
+
+      $("#start-crop").val(0);
+
+      doc.get_id("cropstart").removeAttribute("start");
+      doc.get_id("cropstart").style.width = "0%";
+
+      $("#end-crop").val(100);
+
+      doc.get_id("cropend").removeAttribute("end");
+      doc.get_id("cropend").style.width = "0%";
+
+      doc.get_id("current-time").style.left = "0%";
+      doc.get_id("current-time").removeAttribute("duration");
+      doc.get_id("current-time").removeAttribute("current");
+
+      var eq_canvas_ctx = get_eq_ctx();
+      eq_canvas_ctx.clearRect(0, 0, window.eq_width, window.eq_height);
+
+      doc.get_id("media").setAttribute("played", false);
+      doc.get_id("media").setAttribute("processed", false);
+
+      update_recording_mode("none");
+
+      var is_snippeting = doc.get_id("media").getAttribute("snippeting")
+      doc.get_id("media").removeAttribute("snippeting")
+
+      doc.query("input[name='private']").checked = false;
+
+      doc.get_id("media").setAttribute("limited-waveform", false);
+
+      try {
+        doc
+          .query_all(".transcribe-step .tagged-kid input[type='checkbox']")
+          .forEach(function (checkbox) {
+            checkbox.checked = false;
+          });
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        doc
+          .query_all(".transcribe-step .tagged-adult input[type='checkbox']")
+          .forEach(function (checkbox) {
+            checkbox.checked = false;
+          });
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        doc.get_id("custom-date-field").value = "";
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        doc.get_id("elicited-convo").removeAttribute("src");
+      } catch (error) {}
+
+      window.stream = null;
+      window.mic = null;
+      window.eq_animator = null;
+      window.time_animator = null;
+      window.updated_src = null;
+      window.played = false;
+
+      doc.get_id("media").setAttribute("limited-waveform", false);
+      doc.get_id("app-pages").scrollTop = 0
+
+     if (is_snippeting == "true") {
+            doc.navigate("/scrapbook")
+      }
+    }
+
+    function crop_start(value) {
+      doc.get_id("cropstart").style.width = Number(value) + "%";
+
+      var duration = window.rough_duration
+      if (isNaN(window.player.duration) == false && isFinite(window.player.duration) == true) {
+            duration = window.player.duration
+      }
+
+      var new_val = ((Number(value) / 100) * duration).toFixed(1);
+      if (isFinite(new_val) && !isNaN(new_val)) {
+        doc.get_id("cropstart").setAttribute("start", new_val);
+        window.currentTime = new_val
+      }
+    }
+
+    function crop_end(value) {
+      doc.get_id("cropend").style.width = 100 - Number(value) + "%";
+      doc.get_id("cropend").setAttribute("time", Number(value));
+
+      var duration = window.rough_duration
+      if (isNaN(window.player.duration) == false && isFinite(window.player.duration) == true) {
+            duration = window.player.duration
+      }
+
+      var new_val = ((Number(value) / 100) * duration).toFixed(1);
+      if (isFinite(new_val) && !isNaN(new_val)) {
+        doc.get_id("cropend").setAttribute("end", new_val);
+      }
+    }
+
+    function get_eq_ctx() {
+      var eq_canvas = doc.get_id("eq");
+      window.eq_width = innerWidth - 60;
+      eq_canvas.width = window.eq_width;
+      return eq_canvas.getContext("2d");
+    }
+
+    function draw_waveform() {
+      try {
+        var eq_canvas_ctx = get_eq_ctx();
+        eq_canvas_ctx.clearRect(0, 0, window.eq_width, window.eq_height);
+        eq_canvas_ctx.fillStyle = "#FF7648";
+        var db_max = Math.max.apply(
+          Math,
+          window.all_points.map(function (point) {
+            return point.db;
+          })
+        );
+        var db_min = Math.min.apply(
+          Math,
+          window.all_points.map(function (point) {
+            return point.db;
+          })
+        );
+        var db_range = db_max - db_min;
+        var point_height = window.eq_height / db_range;
+        var point_width = window.eq_width / window.all_points.length;
+        if (window.all_points.length > 0) {
+          for (var p = 0; p < window.eq_width; p++) {
+            if (p % 2 != 0) {
+              var index = Math.floor(
+                (window.all_points.length / window.eq_width) * p
+              );
+              var entry = window.all_points[index];
+              var height = (entry.db / db_range) * eq_height;
+
+              eq_canvas_ctx.fillRect(p, eq_height - height, 1, eq_height);
+            }
+          }
+        }
+      } catch (error) {
+        throw error;
+        console.log("Error rendering EQ", error);
+      }
+    }
+
+    function render_live_waveform(audio_element) {
+      /*  Render the EQ / frequency bars of the active stream
+            attached to window.stream */
+      if (!window.ac) {
+        window.ac = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      var analyser;
+      var analyser_source;
+      var eq_canvas_ctx = get_eq_ctx();
+
+      try {
+        if (!window.ac) {
+          window.ac = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        analyser = window.ac.createAnalyser();
+
+        if (audio_element) {
+          analyser_source = window.ac.createMediaElementSource(audio_element);
+          analyser_source.connect(analyser);
+          analyser_source.connect(window.ac.destination);
+        } else {
+          analyser_source = window.ac.createMediaStreamSource(window.stream);
+          analyser_source.connect(analyser);
+        }
+
+        analyser.fftSize = 1024;
+        var buffer_length = analyser.frequencyBinCount;
+        var eq_data = new Uint8Array(buffer_length);
+        eq_canvas_ctx.clearRect(0, 0, window.eq_width, window.eq_height);
+
+        // per available frame
+        window.all_points = [];
+        var draw_eq = function (time) {
+          window.eq_animator = requestAnimationFrame(draw_eq);
+          analyser.getByteFrequencyData(eq_data);
+
+          eq_canvas_ctx.fillStyle = "rgb(255, 255, 255)";
+          eq_canvas_ctx.fillRect(0, 0, window.eq_width, window.eq_height);
+
+          // calculate the size of the bar to render
+          var bar_x = 0;
+          var bar_height;
+          var bar_width = (window.eq_width / buffer_length) * 3;
+          var total_db = 0;
+          for (var b = 0; b < buffer_length; b++) {
+            bar_height = eq_data[b];
+            total_db = total_db + bar_height;
+            if (bar_height < 5) {
+              bar_height = 5;
+            }
+            eq_canvas_ctx.fillStyle = "#FF7648";
+            eq_canvas_ctx.fillRect(
+              bar_x,
+              window.eq_height - bar_height / 2,
+              bar_width,
+              bar_height / 2
+            );
+            bar_x = bar_x + bar_width + 1;
+          }
+
+          if (time && total_db > 0) {
+            window.all_points.push({
+              t: time,
+              db: total_db,
+            });
+          }
+        };
+
+        draw_eq();
+      } catch (error) {
+        throw error;
+        alert("Error rendering EQ");
+      }
+    }
+
+    function get_start_value() {}
+
+    window.played = false;
+
+    function update_current_time(event) {
+        var current_timestamp = event.timeStamp
+        if (window.first_timestamp == null) {
+            window.first_timestamp = current_timestamp
+        }
+
+        // estimate rough time since last timestamp if current time is N/A
+        var video_time = (current_timestamp - first_timestamp) / 1000
+        if (isNaN(window.player.currentTime) == false && isFinite(window.player.currentTime) == true) {
+            video_time = window.player.currentTime
+        }
+
+        // estimate duration of video if N/A
+        var duration = (window.end_time - window.start_time) / 1000
+        if (isNaN(window.player.duration) == false && isFinite(window.player.duration) == true) {
+            duration = window.player.duration
+        }
+
+        doc.get_id("current-time").style.left = (video_time / duration) * 100 + "%";
+        doc.get_id("current-time").setAttribute("current", video_time.toFixed(1));
+
+        if (doc.get_id("media").getAttribute("snippeting") == "true") {
+            var seconds = window.player.currentTime
+            var total = window.player.duration
+
+            doc.get_id("current-time").style.left = (seconds / total * 100) + "%"
+            doc.get_id("current-time").setAttribute("duration", total)
+            doc.get_id("current-time").setAttribute("current", seconds.toFixed(1))
+            var calculated_start = $("#start-crop").val() / 100 * window.player.duration
+            var calculated_end = $("#end-crop").val() / 100 * window.player.duration
+            var start = (Math.floor(calculated_start * 10) / 10).toFixed(1)
+            var end = (Math.ceil(calculated_end * 10) / 10).toFixed(1)
+            doc.get_id("cropstart").setAttribute("start", start)
+            doc.get_id("cropend").setAttribute("end", end)
+            if (window.player.currentTime > end) {
+                pause_recording()
+                window.player.currentTime = start
+            }
+
+            if (window.player.currentTime < (start - .5)) {
+                window.player.currentTime = start
+            }
+        }
+    }
+
+    function play_recording() {
+        window.first_timestamp = null
+      window.played = false;
+
+      var ua = window.navigator.userAgent;
+      var iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+      var webkit = !!ua.match(/WebKit/i);
+      var iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
+
+      if (iOSSafari == true) {
+        window.player.src = window.updated_src;
+      }
+
+      if (doc.get_id("media").getAttribute("snippeting") == "true") {
+            var calculated_start = $("#start-crop").val() / 100 * window.player.duration
+            var start = (Math.floor(calculated_start * 10) / 10).toFixed(1)
+            if (window.player.currentTime < start) {
+                window.player.currentTime = start
+            }
+      }
+
+      window.player.play();
+
+      if (window.all_points.length == 0) {
+        // render_live_waveform(window.player)
+      }
+
+      update_recording_mode("playing");
+      doc.get_id("media").setAttribute("played", true);
+
+      if (window.fileLastModified) {
+        window.fileLastModified -= new Date(window.fileLastModified).getTimezoneOffset() * 60000
+        var fileDatePrefill = new Date(window.fileLastModified)
+        var dd = fileDatePrefill.getDate();
+        var mm = fileDatePrefill.getMonth()+1;
+        var yyyy = fileDatePrefill.getFullYear();
+        if(dd<10){dd='0'+dd} 
+        if(mm<10){mm='0'+mm} 
+        fileDatePrefill = yyyy+'-'+mm+'-'+dd;
+        $("#custom-date-field").val(fileDatePrefill);
+      }
+    }
+
+    function stop_recording() {
+      window.cancelAnimationFrame(window.eq_animator);
+
+      update_recording_mode("pending");
+      window.mic.stop();
+      window.mic.stream.getTracks().forEach(function (t) {
+        t.stop();
+      });
+
+      window.end_time = new Date().getTime()
+      window.rough_duration = ((window.end_time - window.start_time) / 1000).toFixed(2)
+      doc.get_id("media").setAttribute("played", true);
+
+      draw_waveform();
+    }
+
+    function render_current_time() {
+      if (window.time_animator) {
+        return;
+      }
+
+      var draw_time = function (time) {
+        window.time_animator = requestAnimationFrame(draw_time);
+
+        var seconds = window.player.currentTime;
+        var total = window.player.duration;
+        doc.get_id("current-time").style.left = (seconds / total) * 100 + "%";
+        doc.get_id("current-time").setAttribute("duration", total);
+        doc.get_id("current-time").setAttribute("current", seconds.toFixed(1));
+
+        var calculated_start = ($("#start-crop").val() / 100) * total;
+        var calculated_end = ($("#end-crop").val() / 100) * total;
+        var start = (Math.floor(calculated_start * 10) / 10).toFixed(1);
+        var end = (Math.ceil(calculated_end * 10) / 10).toFixed(1);
+        if (isFinite(start) && !isNaN(start)) {
+          doc.get_id("cropstart").setAttribute("start", start);
+        }
+
+        if (isFinite(end) && !isNaN(end)) {
+          doc.get_id("cropend").setAttribute("end", end);
+        }
+
+        if (seconds > end) {
+          pause_recording();
+          window.player.currentTime = end;
+        }
+      };
+
+      draw_time();
+    }
+
+    function pause_recording() {
+      window.cancelAnimationFrame(window.eq_animator);
+      window.cancelAnimationFrame(window.time_animator);
+      update_recording_mode("pending");
+
+      window.player.pause();
+      window.time_animator = null;
+
+      var pause_time = window.player.currentTime;
+      var recording_duration = window.player.duration;
+      var pause_percentage = Math.floor((pause_time / recording_duration) * 100);
+
+    //   var pause_time = Number(doc.get_id("cropend").getAttribute("time"));
+
+      doc.get_id("current-time").style.left = pause_percentage + "%";
+    }
+
+    function save_recording(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "download";
+      const clickHandler = () => {
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          this.removeEventListener("click", clickHandler);
+        }, 150);
+      };
+
+      a.addEventListener("click", clickHandler, false);
+      a.click();
+      return a;
+    }
+
+    function extract_snippet(conversation_id) {
+        window.extracted = false
+        initialize_audio()
+
+        doc.get_id("media").setAttribute("recording-id", conversation_id);
+        doc.get_id("media").setAttribute("played", true)
+
+        load_recording_url(conversation_id).then(function(url) {
+            window.player.addEventListener("canplaythrough", function () {
+                if (window.extracted == false) {
+                    crop_start(0)
+                    crop_end(100)
+
+                    doc.navigate("/record")
+                    update_recording_mode("paused")
+                    doc.get_id("media").setAttribute("snippeting", true)
+                    doc.get_id("extract-button").innerHTML = "CREATE SNIPPET"
+                    window.extracted = true
+                }
+            })
+
+            window.player.src = url[0]
+            window.updated_src = url[0]
+            window.player.load()
+
+            var aud = window.player
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', aud.src);
+            xhr.responseType = 'blob';
+            xhr.onload = function (e) {
+                window.file = xhr.response
+            }
+            xhr.send();
+        })
+
+        data.get_model_including_id("Recording", conversation_id).then(function(recording) {
+            window.rough_duration = recording.duration
+            window.snippet_OGtime = recording.time + Math.floor((Math.random() * 1000))
+        })
+    }
+
+    function submit_transcription(button, is_clip) {
+      pause_recording()
+      if (is_clip != true) {
+        is_clip = false;
+      }
+
+      if (button.getAttribute("disabled") == "true") {
+        return;
+      }
+
+      button.setAttribute("disabled", "true");
+
+      var storage_ref = firebase.storage().ref();
+
+      var start = "ignore"
+      var end = "ignore"
+      if (is_clip == true) {
+          var start = parseFloat(doc.get_id("cropstart").getAttribute("start"));
+          var end = parseFloat(doc.get_id("cropend").getAttribute("end"));
+      }
+
+      var now = new Date().getTime();
+      var file_time = now;
+      if (doc.get_id("custom-date-container").className == "show") {
+        var inputTimeString = doc.get_id("custom-date-field").value
+        var custom_date = new Date(inputTimeString).getTime();
+        
+        if (
+          !isNaN(custom_date) &&
+          custom_date != undefined &&
+          custom_date != null
+        ) {
+          now = custom_date += new Date(now).getTimezoneOffset() * 60000 + Math.floor((Math.random() * 1000))
+        }
+      }
+
+      if (is_clip == true && window.snippet_OGtime != null) {
+        now = window.snippet_OGtime
+      }
+
+      var duration = window.rough_duration
+      if (isNaN(window.player.duration) == false && isFinite(window.player.duration) == true) {
+        duration = window.player.duration
+      }
+
+      var filename = now + "_" + duration + "_" + start + "_" + end;
+      var uploadTask = storage_ref
+        .child("recordings/" + filename)
+        .put(window.file);
+
+      var conversation_img = null;
+      if (doc.get_id("elicited-convo").hasAttribute("src") == true) {
+        try {
+          conversation_img = parseInt(
+            doc
+              .get_id("elicited-convo")
+              .getAttribute("src")
+              .replace("/images/elicited/", "")
+              .replace(".jpg", "")
+          );
+        } catch (error) {}
+      }
+
+      var tagged_kids = [];
+      doc
+        .query_all(".transcribe-step .tagged-kid input[type='checkbox']")
+        .forEach(function (checkbox) {
+          if (checkbox.checked == true) {
+            tagged_kids.push(checkbox.value);
+          }
+        });
+
+      var tagged_adults = [];
+      doc
+        .query_all(".transcribe-step .tagged-adult input[type='checkbox']")
+        .forEach(function (checkbox) {
+          if (checkbox.checked == true) {
+            tagged_adults.push(checkbox.value);
+          }
+        });
+
+      var visual_icons = [];
+      doc
+        .query_all("#icons .transcription-icon[icon-selected='true']")
+        .forEach(function (_icon) {
+          visual_icons.push(_icon.getAttribute("icon-name"));
+        });
+
+      uploadTask.on("state_changed", function (snapshot) {
+          button.setAttribute(
+            "progress",
+            Math.floor(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            ) + "%"
+          );
+        },
+        function (error) {
+          console.log(error);
+        },
+        function (snapshot) {
+            uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                button.setAttribute("progress", "Upload Complete!")
+                window.allow_sharing ? null : window.allow_sharing = false;
+                var recording_model = {
+                  audio_file: downloadURL,
+                  private: doc.query("input[name='private']").checked,
+                  duration: duration,
+                  can_guess: window.allow_sharing,
+                  time: now,
+                  file_time: file_time,
+                  start: start,
+                  is_clip: is_clip,
+                  end: end,
+                  icons: visual_icons,
+                  tagged_adults: tagged_adults,
+                  tagged_kids: tagged_kids,
+                  user_id: window.user_id,
+                };
+
+                if (is_clip == true) {
+                  recording_model.transcription = doc.query(
+                    "textarea[name='transcription']"
+                  ).value;
+
+                  recording_model.parent_id = doc
+                    .get_id("media")
+                    .getAttribute("recording-id");
+                } else {
+                  recording_model.description = doc.query(
+                    "textarea[name='description']"
+                  ).value;
+                }
+
+                if (conversation_img) {
+                  recording_model.cimg = conversation_img;
+                }
+
+                console.log(recording_model);
+
+                data.create_model("Recording", recording_model).then(function (model_id) {
+                    // doc.notify_success("Your clip has been submitted!")
+
+                    var icons_el = doc.get_id("icons");
+                    icons_el.innerHTML = "";
+
+                    if (is_clip == false) {
+                      db.collection("Recording")
+                        .doc(model_id)
+                        .onSnapshot(function (_doc) {
+                          var _data = _doc.data();
+                          if (_data.processed == true) {
+                                doc.notify_success("An earlier recording has finished processing!", 'small')
+                          }
+                        });
+                    }
+
+                    doc.query("textarea[name='description']").value = "";
+                    doc.get_id("current-time").style.left = "0%";
+                    button.removeAttribute("disabled");
+                    doc.get_id("current-time").removeAttribute("current");
+                    doc.get_id("search-icons").value = "";
+                    hide_search();
+                    doc.query("textarea[name='transcription']").value = "";
+
+                    discard_audio()
+                })
+                .then(function () {
+                  if(window.snippet_OGtime != null){
+                      if(window.snippet_OGtime < window.scrapbook_data.first_batch[window.scrapbook_data.first_batch.length-1].time) {
+                          reset_scrapbook ()
+                          unload_scrapbook()
+                          load_scrapbook(window.user_id, window.user_email)
+                      }else {
+                          //snip falls into first batch
+                      }
+                      window.snippet_OGtime = null;
+                  }
+                })
+            })
+        }
+      );
+    }
+  </script>
+
+  <script>
+    function start_conversation() {
+      doc
+        .get_id("elicited-convo")
+        .setAttribute(
+          "src",
+          "/images/elicited/" + (Math.floor(Math.random() * 104) + 1) + ".jpg"
+        );
+      doc.get_id("elicited-convo").setAttribute("show", true);
+      start_recording("elicit");
+      doc.get_id("media").setAttribute("limited-waveform", false);
+    }
+  </script>
+</clip-recorder>

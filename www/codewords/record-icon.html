@@ -1,0 +1,374 @@
+<record-icon definition>
+
+	<template>
+		<div class="button" onclick="start_recording()">
+			<input id="fallback-field" class="recorder-fallback" type="file" accept="audio/*" capture="microphone" onchange="fallback_recording(event)">
+
+			<div class="recorder-fallback"></div>
+
+			<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" class="record-icon" viewBox="0 0 1500 1500"><defs><style>.cls-1{fill:#c42f12;}</style></defs><title>Kid Talk</title><path class="cls-1" d="M764.38,97.36c258.85,7.5,504.85,183.71,595.24,426.38,75.57,202.9,42,443-86.72,617.14s-348.52,276.8-564.63,263.33c-215.1-13.41-419.7-141.46-525.78-329.07C131,984,103.44,880,100.18,775.54,88.61,404,384.13,86.35,764.38,97.36Z"/><path d="M764.38,146.78c243.16,10.64,475.5,174.94,554,408.09,85.22,253.23-7.18,546.33-231.08,695.44-213.07,141.91-489.16,138.18-696.09-13.79-215.13-158-294.15-443.86-205-693.09,87.13-243.67,321.44-400.7,578.22-396.65,63.63,1,63.65-97.84,0-98.84C494.73,43.69,242.46,194.27,124.05,438.19-6.9,707.92,41.55,1045.19,260.54,1255c218.35,209.21,544.13,257.28,812.74,118.28,273.78-141.69,416.9-451.07,363.88-752.37C1380.63,299.66,1085.22,62,764.38,47.94,700.78,45.16,700.92,144,764.38,146.78Z"/></svg>
+
+			Spontaneous
+		</div>
+	</template>
+
+	<style>
+		input.recorder-fallback {
+			border:1px solid #000;
+			display:block;
+			left:0; right:0;
+			top:0; bottom:0;
+			opacity:0;
+			position:absolute;
+			width:100%;
+			z-index:3;
+		}
+
+		div.recorder-fallback {
+			background-image:url("/images/SVG/buttons/KidTalk_Record.svg");
+			background-size:contain;
+			display:block;
+			margin:20px auto;
+			height:60px;
+			width:60px;
+		}
+
+		#record_button .recorder-fallback {
+			display:none;
+		}
+
+		body[fallback="true"] #record_button .recorder-fallback {
+			display:block;
+		}
+
+		body[fallback="true"] .record-icon {
+			display:none;
+		}
+
+		.record-icon {
+			height:100px;
+			width:100px;
+		}
+
+		#download_wav {
+
+		}
+
+		.processing-modal * {
+			display:none;
+		}
+
+		.processing-modal *:first-child {
+			display:block;
+		}
+
+
+	</style>
+
+	<style>
+		input[type=range] {
+		  width: 100%;
+		  margin: 13.8px 0;
+		  background-color: transparent;
+		  -webkit-appearance: none;
+		}
+		input[type=range]:focus {
+		  outline: none;
+		}
+		input[type=range]::-webkit-slider-runnable-track {
+		  background: #3071a9;
+		  border: 0.2px solid #010101;
+		  border-radius: 1.3px;
+		  width: 100%;
+		  height: 8.4px;
+		  cursor: pointer;
+		}
+		input[type=range]::-webkit-slider-thumb {
+		  margin-top: -14px;
+		  width: 16px;
+		  height: 36px;
+		  background: #ffffff;
+		  border: 1px solid #000000;
+		  border-radius: 3px;
+		  cursor: pointer;
+		  -webkit-appearance: none;
+		}
+		input[type=range]:focus::-webkit-slider-runnable-track {
+		  background: #367ebd;
+		}
+		input[type=range]::-moz-range-track {
+		  background: #3071a9;
+		  border: 0.2px solid #010101;
+		  border-radius: 1.3px;
+		  width: 100%;
+		  height: 8.4px;
+		  cursor: pointer;
+		}
+		input[type=range]::-moz-range-thumb {
+		  width: 16px;
+		  height: 36px;
+		  background: #ffffff;
+		  border: 1px solid #000000;
+		  border-radius: 3px;
+		  cursor: pointer;
+		}
+		input[type=range]::-ms-track {
+		  background: transparent;
+		  border-color: transparent;
+		  border-width: 14.8px 0;
+		  color: transparent;
+		  width: 100%;
+		  height: 8.4px;
+		  cursor: pointer;
+		}
+		input[type=range]::-ms-fill-lower {
+		  background: #2a6495;
+		  border: 0.2px solid #010101;
+		  border-radius: 2.6px;
+		}
+		input[type=range]::-ms-fill-upper {
+		  background: #3071a9;
+		  border: 0.2px solid #010101;
+		  border-radius: 2.6px;
+		}
+		input[type=range]::-ms-thumb {
+		  width: 16px;
+		  height: 36px;
+		  background: #ffffff;
+		  border: 1px solid #000000;
+		  border-radius: 3px;
+		  cursor: pointer;
+		  margin-top: 0px;
+		  /*Needed to keep the Edge thumb centred*/
+		}
+		input[type=range]:focus::-ms-fill-lower {
+		  background: #3071a9;
+		}
+		input[type=range]:focus::-ms-fill-upper {
+		  background: #367ebd;
+		}
+		/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+		how to remove the virtical space around the range input in IE*/
+		@supports (-ms-ime-align:auto) {
+		  /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+		  input[type=range] {
+		    margin: 0;
+		    /*Edge starts the margin from the thumb, not the track as other browsers do*/
+		  }
+		}
+
+	</style>
+
+	<script>
+		function fallback_recording(input_field) {
+			initialize_audio()
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				window.updated_src = e.target.result
+				window.player.src = window.updated_src
+				update_recording_mode("pending")
+			}
+
+			reader.readAsDataURL(doc.get_id("fallback-field").files[0])
+			window.file = doc.get_id("fallback-field").files[0]
+
+			doc.get_id("media").setAttribute("playback", false)
+			doc.get_id("custom-date-container").className = "show"
+			doc.get_id("media").setAttribute("limited-waveform", true)
+		}
+	</script>
+
+	<script>
+		// see: Samuel Williams http://sfg.id0t.x10.mx 
+		// see: https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+		function interleave(chanData){
+			var chans  = chanData.length;
+			if (chans === 1) {
+				return chanData[0]
+			};
+			var l0     = chanData[0].length;
+			var length = l0 * chans;
+			var result = new Float32Array(length);
+			// --
+			var index = 0;
+			var inputIndex = 0;
+			for (var i=0; i<l0; i++){
+				for(var c=0; c<chans; c++){ 
+					result[i*chans+c] = chanData[c][i];
+				}
+			}
+			return result;
+		}
+
+		function floatTo16BitPCM(output, offset, input){
+			try {
+		    	for (var i = 0; i < input.length; i++, offset+=2){
+		      		var s = Math.max(-1, Math.min(1, input[i]));
+		      		output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+		    	}
+			} catch(ex) {
+				alert(ex);
+			}
+		}
+
+		function wr(view, offset, string){
+			for (var i = 0; i < string.length; i++){
+				view.setUint8(offset + i, string.charCodeAt(i));
+			}
+		} 
+
+		function getAudioSamplesAsWavBlob(samples, interleavedChannels, sampleRate){
+			interleavedChannels = interleavedChannels||1;
+			console.log("encoding wav: samples:"+samples.length+", chans:"+interleavedChannels+", rate:"+sampleRate);
+			var buffer  = new ArrayBuffer(44 + samples.length * 2); // 44 + PCM points * 2
+			var dv      = new DataView(buffer);
+			// -- header
+			wr(dv, 0, 'RIFF');   // RIFF
+			dv.setUint32(4, 32 + samples.length * interleavedChannels, true); // 32 + length
+			wr(dv, 8, 'WAVE');   // RIFF type
+			// -- chunk 1
+			wr(dv, 12, 'fmt ');  // chunk id
+			dv.setUint32(16, 16, true);   // subchunk1size (16 for PCM)
+			dv.setUint16(20, 1, true);    // 1=PCM
+			dv.setUint16(22, interleavedChannels, true); // num channels
+			dv.setUint32(24, sampleRate, true);          // samplerate
+			dv.setUint32(28, sampleRate * interleavedChannels * 2, true); // byterate
+			dv.setUint16(32, 2 * interleavedChannels, true);  // block align
+			dv.setUint16(34, 16, true); // bits per sample (16 = 2 bytes)
+			// -- chunk 2
+			wr(dv, 36, 'data');         // data chunk id
+			dv.setUint32(40, samples.length * interleavedChannels, true); // chunk len
+			floatTo16BitPCM(dv, 44, samples);
+			var wavBlob = new Blob([dv], {type: "audio/wav"});
+			return wavBlob;
+		};
+
+		function exportWAVSampleAndSave(sample, cb){
+			var chanData = [];
+			var chans    = sample.numberOfChannels;
+			console.log("Sample channels:", chans);
+			for(var c=0; c<chans; c++){chanData.push(sample.getChannelData(c));}
+			var sample_chandata = interleave(chanData);
+			console.log("interleaved chandata length:", sample_chandata.length);
+			return cb(getAudioSamplesAsWavBlob(sample_chandata, chans, sample.sampleRate));
+		};
+
+		function go(){
+			if (!window.ac) {
+				window.ac = new (window.AudioContext || window.webkitAudioContext)();
+			}
+
+			var audioContext = window.ac
+
+			var _reader = new FileReader();
+			var myBuffer;
+
+			// reader.readAsDataURL(event.target.files[0])
+			_reader.onload = function() {
+				console.log('file loaded')
+				window.fileLastModified = document.querySelector('#select_wav').files[0].lastModified
+			    window.loaded_file = _reader.result;
+			    doc.get_id("custom-date-container").className = "show"
+			    doc.render_modal("<div class='processing-modal' style='font-size:1.6rem; font-weight:700; padding-top:70px; text-align:center'><div class='button' style='display:inline-block; width:80%' onclick='load_file(); this.remove()'>Import Audio from Video</div><span>This may take a few moments!</span></div>", true)
+			};
+
+			setTimeout(function(){
+				if (doc.get_id("select_wav").files[0].size < 500000000) {
+					_reader.readAsArrayBuffer(doc.get_id("select_wav").files[0]);	
+				} else {
+					doc.render_modal("<div class='processing-modal' style='color:#FF7648; font-size:1.4rem; padding:20px; font-weight:700;text-align:center'>KidTalk currently supports videos that are less than 500MB.</div><div style='padding:20px;text-align:center;'> Please crop or compress your video further! </div>")
+				}
+			}, 500)
+		}
+
+		function load_file () {
+			if (!window.ac) {
+				window.ac = new (window.AudioContext || window.webkitAudioContext)();	
+			}
+
+			var audioContext = window.ac
+			console.log('loaded')
+			console.log(window.loaded_file)
+			var _return = audioContext.decodeAudioData(window.loaded_file, function(decodedAudioData) {
+				console.log('decoded')
+				try {
+					var _duration = decodedAudioData.duration;
+					var offlineAudioContext = new(window.OfflineAudioContext||window.webkitOfflineAudioContext)(2,44100*_duration,44100);
+					var soundSource = offlineAudioContext.createBufferSource();
+					var off_analyser = offlineAudioContext.createAnalyser();
+
+					myBuffer = decodedAudioData;
+					soundSource.buffer = myBuffer;
+					soundSource.connect(offlineAudioContext.destination);
+					var scp = offlineAudioContext.createScriptProcessor(1024, 0, 1);
+					scp.connect(offlineAudioContext.destination);
+					soundSource.connect(off_analyser)
+
+					offlineAudioContext.oncomplete = function(e){
+				  		exportWAVSampleAndSave(e.renderedBuffer, function(blob){
+				  			window.file = blob
+				  			window.updated_src = window.URL.createObjectURL(blob)
+				  			window.player.src = window.updated_src
+				  			
+				  			draw_waveform()
+
+				  			setTimeout(function () {
+				  				doc.get_id("media").setAttribute("limited-waveform", false)
+				  				update_recording_mode("pending")
+				  				doc.close_modal()
+				  			}, 500)
+				  		});
+
+						document.querySelectorAll("button")[1].removeAttribute("disabled");
+					};
+
+					var freqData = new Uint8Array(off_analyser.frequencyBinCount);
+					var _buffer_length = off_analyser.frequencyBinCount;
+					scp.onaudioprocess = function(event){
+						off_analyser.getByteFrequencyData(freqData);
+						
+						var total_db = 0;
+	            		for(var b = 0; b < _buffer_length; b++) {
+	                		bar_height = freqData[b];
+	                		total_db = total_db + bar_height
+	                	}
+
+	                    if (event.timeStamp && total_db > 0) {
+	                        window.all_points.push({
+	                            t: event.timeStamp,
+	                            db: total_db
+	                        })
+	                    }
+					}
+					console.log('finished processing')
+
+					offlineAudioContext.startRendering();
+					soundSource.start ? soundSource.start(0):soundSource.noteOn(0);
+				} catch(ex) {
+					alert(ex);
+				}
+			}, function (error) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					window.updated_src = e.target.result
+					window.player.src = window.updated_src
+
+					update_recording_mode("pending")
+					doc.close_modal()
+				}
+
+				reader.readAsDataURL(doc.get_id("select_wav").files[0])
+				window.file = doc.get_id("select_wav").files[0]
+
+				doc.get_id("media").setAttribute("playback", false)
+				doc.get_id("media").setAttribute("limited-waveform", true)
+				// reader.readAsDataURL(event.target.files[0])
+				// window.file = event.target.files[0]
+
+				// doc.get_id("media").setAttribute("playback", false)
+				// doc.render_modal("<div style='font-size:1.6rem; font-weight:700; padding:50px 0; text-align:center'>Unsupported Device Error</div>")
+			});
+		}
+	</script>
+
+</record-icon>

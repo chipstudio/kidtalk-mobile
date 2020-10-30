@@ -1,0 +1,540 @@
+<family-management definition>
+	<template>
+		<div class="family-management-container">
+			<div class="configure family-members">
+		        <div class="kid-family-members">
+		            <div class="configure-title">Children Participating</div>
+		            <template id="child-family-member">
+		                <div class="child-family-member" 
+		                    data-birth_month="{{birth_month}}"
+		                    data-birth_year="{{birth_year}}"
+		                    data-child_id="{{id}}" 
+		                    onclick="edit_child(event)">
+                            <img src="/images/SVG/Avatars/kid/{{kid_avatar}}.svg">
+                            {{first_name}}
+                        </div>
+		            </template>
+		            <div id="existing-children"></div>
+		            <button id="add_child" onclick="add_new_child(event)">+ Add Child</button>
+		        </div>
+		        <div class="tagged-adults">
+		        	<div class="configure-title">Adults to Tag in Audio</div>
+		            <template id="adult-family-member">
+		                <div class="adult-family-member"
+		                    data-adult_id="{{id}}" 
+		                    data-original_creator="{{original_creator}}"
+		                    onclick="edit_adult(event)">
+                            <img src="/images/SVG/Avatars/parent/{{parent_avatar}}.svg">
+                            {{first_name}}
+                        </div>
+		            </template>
+		            <div id="existing-adults"></div>
+		            <button id="add_adult" onclick="add_new_adult(event)">+ Add Adult</button>
+		        </div>
+		        <div class="access-invitations">
+		        	<template id="access-invitation">
+		        		<div class="access-invitation">
+		        			<div class="member-name">{{name}}</div>
+		        			<div class="member-record-access">{{record_access}}</div>
+		        			<div class="edit-access" data-invitation_id="{{id}}" 
+		        				onclick="edit_member_access(event)">Edit</div>
+		        		</div>
+		            </template>
+		        	<template id="child-access-invitation-set">
+		        		<div id="access_invitations_{{id}}">
+			        		<div class="configure-title">Access to {{first_name}}'s Clips</div>
+				        		<div class="access-invitations-set">
+				        		<div class="access-headers">
+				        			<div class="member-name">User</div>
+			        				<div class="member-record-access">Can Record</div>
+			        				<div class="edit-access">Actions</div>
+				        		</div>
+				        		<div id="child_invitations_{{id}}" class="child-invitations"></div>
+			        		</div>
+			        		<button id="give_access_{{id}}" 
+			        			class="give-access-button invite-button" data-child_id="{{id}}" 
+			        			onclick="invite_member_to_access(event)">
+			        			+ Invite User to {{first_name}}'s Clips
+			        		</button>
+		        		</div>
+		        	</template>
+		            <div id="existing-invitations"></div>
+                    <template id="view-only-invitation">
+                        <div class="access-invitation">
+                            <div class="member-name">{{name}}</div>
+                            <div class="member-record-access">{{record_access}}</div>
+                            <div class="member-name">None</div>
+                        </div>
+                    </template>
+                    <div id="children_shared_with_me">
+                        <div class="configure-title">Children Shared With Me</div>
+                            <div class="access-invitations-set">
+                            <div class="access-headers">
+                                <div class="member-name">Child</div>
+                                <div class="member-record-access">Can Record</div>
+                                <div class="edit-access">Actions</div>
+                            </div>
+                            <div id="shared_child_invitations" class="child-invitations"></div>
+                        </div>
+                    </div>
+		        </div>
+		    </div>
+		</div>
+	</template>
+
+	<style type="text/css">
+		.tagged-adults {
+            /*display:none;*/
+        }
+        .access-invitation {
+        	/*border-top:1px solid #eee;*/
+        	margin:0.4rem auto;
+        	padding-top:1.0rem;
+        	width:100%;
+        }
+        .access-invitations-set {
+        	margin:1.0rem auto;
+        }
+        .access-headers {
+        	color:black;
+        	font-size:1.2rem;
+        	font-weight:700;
+        	margin-top:1.5rem;
+        }
+        .access-headers .edit-access {
+        	color:black;
+        }
+        #children_shared_with_me {
+            display:none;
+        }
+        .edit-access {
+        	color:#FF7648;
+        }
+        .member-name,
+        .member-record-access,
+        .edit-access {
+        	display:inline-block;
+        	font-weight:700;
+        	text-align:center;
+        	width:32%;
+        }
+        .adult-family-member, 
+        .child-family-member {
+            background:#F4ECE1;
+            border-radius:10px;
+            color:black;
+            font-size:1.2rem;
+            font-weight:700;
+            margin:10px auto 0px auto;
+            padding:15px;
+            text-align:center;
+        }
+
+        .adult-family-member img, 
+        .child-family-member img {
+            height:30px;
+            margin-right:10px;
+            vertical-align:middle;
+            width:auto;
+        }
+
+        .adult-family-member img[src="/images/SVG/Avatars/parent/.svg"],
+        .child-family-member img[src="/images/SVG/Avatars/kid/.svg"] {
+            display:none;
+        }
+
+        .tagged-adults,
+        .kid-family-members,
+        .access-invitations .configure-title {
+        	margin:3.5rem auto 0 auto;
+        }
+        .kid-family-members {
+        	margin-top:0;
+        }
+        button#add_child,
+        button#add_adult,
+        button#give_access,
+        .give-access-button {
+            background:#FF7648;
+            border:none;
+            border-radius:10px;
+            box-sizing:border-box;
+            color:white;
+            font-weight:700;
+            font-size:1.0rem;
+            line-height:2.0rem;
+            outline:none;
+            padding:10px;
+            width:100%;
+        }
+        .child-family-member:last-child,
+        .adult-family-member:last-child,
+        .access-invitation:last-child {
+            margin-bottom:15px;
+        }
+        .invite-button {
+        	width:100%;
+        }
+        .configure-title {
+            color:#FF7648;
+            font-size:24px;
+            font-weight:700;
+            margin:20px;
+        }
+        .configure {
+            margin-bottom:40px;
+        }
+        .family-management-container {
+            color:black;
+            text-align:center;
+            max-width:360px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        .give-access-button {
+        	font-size:1.0rem;
+        	margin-top:1.0rem;	
+        }
+	</style>
+
+	<script type="text/javascript">
+        var all_kids_to_tag = [];
+
+		/* Load Family Members and Children */
+		function load_family_management (user_id) {
+            data.subscribe_collection("Kid", {
+                query: function (query) {
+                    return query.where("original_creator", "==", user_id)
+                }, 
+                update: function (kids) {
+                    /* Show Saved Children on the DOM */
+                    var kids_container = doc.get_id("existing-children");
+                    var kids_template = doc.get_id("child-family-member");
+                    doc.clear_and_replace(kids, kids_container, kids_template);
+
+                    /* Add My Children to tagged children options */
+                    var tag_kids_el = doc.get_id("tag-kids")
+                    var tag_template = doc.get_id("tag-kid-template")
+                    all_kids_to_tag = kids;
+                    doc.clear_and_replace(kids, tag_kids_el, 
+                        tag_template);
+
+                    /* Show Child Recording Sharing Settings */
+                    var kids_container = doc.get_id("existing-invitations");
+                    var kids_template = doc.get_id("child-access-invitation-set");
+                    doc.clear_and_replace(kids, kids_container, kids_template)
+
+                    /* Add Shared Recording Tagging Ability */
+                    add_shared_recording_tags(tag_kids_el, tag_template)
+
+                    /* Show Children That Have Been Shared With Me */
+                    show_shared_with_me_children()
+                    
+                    /* Once child's access invitation sets are setup, add invitations to each set */
+                	kids.forEach(function(kid) {
+                		data.subscribe_collection("Invitation", {
+			                query: function (query) {
+			                    return query.where("original_creator", "==", user_id).where("kid", "==", kid.id)
+			                }, 
+			                update: function (invitations) {
+			                	// try {
+			                		
+			                		if (invitations.length > 0) {
+			                			var invitations_container = doc.get_id("child_invitations_" + kid.id);
+				                    	var invitation_template = doc.get_id("access-invitation");
+				                    	invitations.forEach(function(x) {
+                                            db.collection("User").where("email", "==", x.email).limit(1).get().then((query) => {
+                                                if (!query.empty && x.name !== query.docs[0].data().first_name) {
+                                                    const new_name = query.docs[0].data().first_name
+                                                    db.collection("Invitation").where("email", "==", x.email).get().then((query) => {
+                                                        query.docs.forEach((tag)=>{
+                                                            tag.ref.update({
+                                                                name: new_name,
+                                                            })
+                                                        })
+                                                    });
+                                                } 
+                                            })
+				                    		if (x.record_access == "true" || x.record_access == true) {
+				                    			x.record_access = "&#10004;";
+				                    		} else if (x.record_access == "false" || x.record_access == false) {
+                                                x.record_access = ""
+                                            }
+				                    	})
+				                    	doc.clear_and_replace(invitations, invitations_container, invitation_template);
+			                		} else {
+			                			if (invitations.length == 0) {
+                                            var invitations_container = doc.get_id("child_invitations_" + kid.id);
+				                    	    var invitation_template = doc.get_id("access-invitation");
+                                            doc.clear_and_replace(invitations, invitations_container, invitation_template);
+				                    		doc.get_id('access_invitations_' + kid.id)
+				                    			.querySelector('div.access-headers').style.display = 'none';
+				                    	} else {
+				                    		doc.get_id('access_invitations_' + String(invitations[0].kid))
+				                    			.querySelector('div.access-headers').style.display = 'block';
+				                    	}
+			                		}
+			                    	
+			                	// } 
+			                }
+			            })
+                    })
+                }
+            })
+            data.subscribe_collection("TaggedAdult", {
+                query: function (query) {
+                    return query.where("original_creator", "==", user_id)
+                }, 
+                update: function (tagged_adults) {
+                    tagged_adults.forEach(function(x) {
+                        if(x.email){
+                            db.collection("User").where("email", "==", x.email).limit(1).get().then((query) => {
+                                if (!query.empty && x.name !== query.docs[0].data().first_name) {
+                                    db.collection("TaggedAdult").where("email", "==", x.email).get().then((query) => {
+                                        query.docs.forEach((tag)=>{
+                                            tag.ref.update({
+                                                first_name: query.docs[0].data().first_name,
+                                                parent_avatar: query.docs[0].data().parent_avatar
+                                            })
+                                        })
+                                    });
+                                } 
+                            })
+                        }
+                    })
+
+                    /* Show Saved Adults on the DOM */
+                    var adults_container = doc.get_id("existing-adults");
+                    var adults_template = doc.get_id("adult-family-member");
+                    doc.clear_and_replace(tagged_adults, adults_container, adults_template);
+
+                    /* Add Adult Tags Here For Clip Recorder */
+                    var tag_adults_el = doc.get_id("tag-adults")
+                    var tag_template = doc.get_id("tag-adult-template")
+
+                    doc.clear_and_replace(tagged_adults, tag_adults_el, 
+                        tag_template);
+
+                    tag_adults_el.appendChild(doc.render(tag_template, {
+                        id: window.user_id,
+                        first_name: "Myself",
+                        parent_avatar: window.user.parent_avatar,
+                    }))
+                }
+            })
+		}
+
+        /* Show Shared With Me Children In My Family Section */
+        function show_shared_with_me_children () {
+            data.subscribe_collection("Invitation", {
+                query: function(query) {
+                    return query.where("email", "==", window.user_email)
+                },
+                update: function(invitations) {
+                    if (invitations.length == 0) {
+                        doc.get_id('children_shared_with_me').style.display = 'none';
+                    } else if (invitations.length > 0) {
+                        var invitations_container = doc.get_id("shared_child_invitations");
+                        var invitation_template = doc.get_id("view-only-invitation");
+                        invitations.forEach(function(x) {
+                            if (x.record_access == "true" ||
+                                x.record_access == true) {
+                                x.record_access = "&#10004;";
+                            }
+                        })
+                        child_names = []
+                        new Promise(function(resolve, reject) {
+                            invitations.forEach(function(x) {
+                                data.get_model_including_id("Kid", x.kid).then(function(y) {
+                                    try {
+                                        child_names.push([y.id, y.first_name])
+                                        if (invitations[invitations.length - 1] == x) {
+                                            resolve("Success")
+                                        }
+                                    } catch (error) {
+                                        reject(error);
+                                    } 
+                                })
+                            })
+                        }).then(function(result) {
+                            invitations.forEach(function(x) {
+                                try {
+                                    x.name = child_names.filter(y => x.kid == y[0])[0][1]
+                                } catch {
+                                    x.name = "N/A"
+                                }
+                            })
+                            doc.clear_and_replace(invitations, invitations_container, invitation_template);
+                            doc.get_id('children_shared_with_me').style.display = 'block';
+                        })
+                    }
+                }
+            })
+        }
+        
+
+        /* Remove Child from Family List */
+        function remove_child_from_family (child_id) {
+            data.get_model_including_id("Family", window.family_id).then(function(family){
+                if (family.hasOwnProperty("kids") == false) {
+                    family.kids = []
+                } else {
+                    /* Remove Kid from Family List */
+                    const index = family.kids.indexOf(child_id);
+                    if (index > -1) {
+                      family.kids.splice(index, 1);
+                    }
+                }
+                data.update_model("Family", family.id, family, true)
+            })
+        }
+
+		/* Add Adult Family Member */
+        function add_new_adult (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            doc.create_model_modal("TaggedAdult", {
+                original_creator:window.user_id,
+            }, ['id', 'original_creator'], ["first_name", "original_creator", "parent_avatar"]);
+        }
+
+        /* Edit Adult */
+        function edit_adult (event) {
+            data.get_model_including_id("TaggedAdult", 
+                event.target.getAttribute("data-adult_id"))
+                .then(function(this_adult) {
+                    doc.create_model_modal("TaggedAdult", this_adult, ['id', 'original_creator', 'has_initialed', "email"]);
+
+                    if(!this_adult.email){
+                        var invited_but_not_tagged = []
+                        var all_data_TaggedAdult_email = [];
+                        var collection_ref_TaggedAdult = window.db.collection("TaggedAdult")
+                        collection_ref_TaggedAdult = collection_ref_TaggedAdult.where("original_creator", "==", window.user_id)
+                        collection_ref_TaggedAdult.get().then(function(taggedAdults) {
+                            taggedAdults.docs.forEach(function(taggedAdult) {
+                                console.log(taggedAdult.data())
+                                var _data = taggedAdult.data();
+                                if(_data.email){
+                                    all_data_TaggedAdult_email.push(_data.email)
+                                }
+                                var taggedAdults = all_data_TaggedAdult_email;
+                            })
+                        });
+
+                        var all_data_Invitation = [];
+                        var collection_ref_Invitation = window.db.collection("Invitation")
+                        collection_ref_Invitation = collection_ref_Invitation.where("original_creator", "==", window.user_id)
+                        collection_ref_Invitation.get().then(function(invitations) {
+                            invitations.docs.forEach(function(invitation) {
+                                var _data = invitation.data();
+                                all_data_Invitation.push(_data)})
+                                var invitations = all_data_Invitation;
+                                all_data_Invitation.forEach(invite => {
+                                    if(all_data_TaggedAdult_email.includes(invite.email)){
+                                        //do nothing
+                                    }else{
+                                        invited_but_not_tagged.push(invite)
+                                    }
+                                })
+
+
+                                var invitesLinkSelect = $('<select/>').attr("name", "email")
+                                invitesLinkSelect.css("marginBottom", "1.0rem");
+                                var emails_and_names = [];
+                                invitesLinkSelect.append('<option disabled selected value>Select an Invited User</option>')
+                                    for (var i in invited_but_not_tagged) {
+                                        var email_and_name = String(invited_but_not_tagged[i].email) + 
+                                            String(invited_but_not_tagged[i].name);
+                                        if (!emails_and_names.includes(email_and_name)) {
+                                            var option = $('<option/>')
+                                                            .val(invited_but_not_tagged[i].email)
+                                                            .attr("name", invited_but_not_tagged[i].name)
+                                                            .text(invited_but_not_tagged[i].name)
+                                            invitesLinkSelect.append(option)
+                                            emails_and_names.push(email_and_name);
+                                        }
+                                    }
+                                $('form[model-name ="TaggedAdult"] [name ="email"]').replaceWith(invitesLinkSelect);
+                                $('<label style="line-height:1.8rem; margin-top:2.0rem;">Link Invited User to This Tag</label>').insertBefore($('[name ="email"]'))
+                            })
+                    }else{
+                        var collection_ref_User = window.db.collection("User")
+                        collection_ref_User = collection_ref_User.where("email", "==", this_adult.email)
+                        collection_ref_User.get().then(function(user) {
+                            if (!user.empty) {
+                                $('form[model-name ="TaggedAdult"] img').not(' img[data-value ='+ user.docs[0].data().parent_avatar +']').hide();
+                                $('form[model-name ="TaggedAdult"] [name ="first_name"]').attr("disabled", true);
+                                $('form[model-name ="TaggedAdult"] [name ="first_name"]').css("border", "none");
+                                $('form[model-name ="TaggedAdult"] [name ="first_name"]').css("background-color", "white");
+                                $('form[model-name ="TaggedAdult"] input[type ="submit"]').hide()
+                            }
+                        })
+                    }
+                }
+            )
+        }
+
+        /* Add Child Family Member */
+        function add_new_child (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            doc.create_model_modal("Kid", {
+            	'original_creator':window.user_id
+            }, ['id', 'original_creator'], ["first_name", "original_creator", "birth_year", "birth_month", "kid_avatar"]);
+        }
+
+        /* Edit Child */
+        function edit_child (event) {
+            data.get_model_including_id("Kid", 
+                event.target.getAttribute("data-child_id"))
+                .then(function(this_kid) {
+                    doc.create_model_modal("Kid", this_kid, ['id', "original_creator"]);
+            });
+        }
+
+        /* Invite Member To Access */
+        function invite_member_to_access (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            doc.create_model_modal("Invitation", {
+            	'original_creator':window.user_id,
+            	'kid':event.target.getAttribute("data-child_id"),
+            }, ['id', 'kid', 'original_creator'], ["name", "record_access", "email", "kid", "original_creator"]);
+        }
+
+        /* Edit Member Access */
+        function edit_member_access (event) {
+            data.get_model_including_id("Invitation", 
+                event.target.getAttribute("data-invitation_id"))
+                .then(function(this_invitation) {
+                    doc.create_model_modal("Invitation", this_invitation, ['id', "kid", "email", "original_creator"]);
+            });
+        }
+
+        /* Add Shared Kids I have Record Access to to Recording Tags (For Record View) */
+        function add_shared_recording_tags (tag_kids_el, tag_template) {
+            data.subscribe_collection("Invitation", {
+                query: function (inv_query) {
+                    return inv_query.where("email", "==", window.user_email).where("record_access", "==", true)
+                },
+                 update: function (record_invitations) {
+                    var shared_kid_ids = []
+                    record_invitations.forEach(function(record_invitation) {
+                        shared_kid_ids.push(record_invitation.kid);
+                    })
+                    data.get_model_ids("Kid", shared_kid_ids).then(function(shared_kids) {
+                        all_kids_to_tag = all_kids_to_tag.concat(shared_kids);
+                        var kids_container = doc.get_id("existing-invitations");
+                        var kids_template = doc.get_id("child-access-invitation-set");
+                        shared_kids.forEach(function(shared_kid) {
+                            tagged_child_objects[shared_kid.id] = shared_kid; 
+                        })
+                        doc.clear_and_replace(all_kids_to_tag, tag_kids_el, 
+                            tag_template);
+                    })
+                }
+            })
+        }
+	</script>
+
+</family-management>
