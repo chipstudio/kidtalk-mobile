@@ -436,7 +436,7 @@
 
         function load_recording_url (recording_id) {
             return new Promise(function (resolve, reject) {
-                var get_url = window.location.origin + "/get_recording_url/" + recording_id
+                var get_url = "https://kidtalkdev.web.app" + "/get_recording_url/" + recording_id
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState == XMLHttpRequest.DONE) {
