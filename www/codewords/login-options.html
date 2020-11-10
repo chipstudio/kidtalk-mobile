@@ -111,12 +111,13 @@
             text-align: center;
         }
 	</style>
-
+    <script src="../libs/login-options.js"></script>
     <script>
         function login (provider) {
             var provider_obj;
             if (provider == "google") {
-                provider_obj = new firebase.auth.GoogleAuthProvider()
+                // provider_obj = new firebase.auth.GoogleAuthProvider()
+                Capacitor.Plugins.GoogleAuth.signIn();
             } else if (provider == "facebook") {
                 provider_obj = new firebase.auth.FacebookAuthProvider()
             } else if (provider == "email") {

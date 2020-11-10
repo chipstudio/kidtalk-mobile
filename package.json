@@ -19,6 +19,11 @@
   "dependencies": {
     "@capacitor/android": "^2.4.2",
     "@capacitor/cli": "^2.4.2",
-    "@capacitor/core": "^2.4.2"
+    "@capacitor/core": "^2.4.2",
+    "@codetrix-studio/capacitor-google-auth": "^2.1.1"
+  },
+  "devDependencies": {
+    "browser-resolve": "^2.0.0",
+    "esmify": "^2.1.1"
   }
 }
