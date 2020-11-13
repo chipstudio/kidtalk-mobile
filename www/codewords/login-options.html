@@ -118,7 +118,6 @@
             if (provider == "google") {
                 // provider_obj = new firebase.auth.GoogleAuthProvider()
                 let googleUser = await Capacitor.Plugins.GoogleAuth.signIn();
-                console.log("login -> googleUser", googleUser)
 
                 // We need to register an Observer on Firebase Auth to make sure auth is initialized.
                 var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
@@ -129,8 +128,11 @@
                     var credential = firebase.auth.GoogleAuthProvider.credential(
                         googleUser.authentication.idToken);
                     // Sign in with credential from the Google user.
-                    firebase.auth().signInWithCredential(credential).catch(function(error) {
+                    firebase.auth().signInWithCredential(credential).then(function(result) {
+                        console.log("firebase.auth -> result", result);
+                    }).catch(function(error) {
                         console.log("unsubscribe -> error", error)
+
                         // Handle Errors here.
                         var errorCode = error.code;
                         var errorMessage = error.message;
@@ -141,7 +143,7 @@
                         // ...
                     });
                     } else {
-                    console.log('User already signed-in Firebase.');
+                        console.log('User already signed-in Firebase.');
                     }
                 });
 
