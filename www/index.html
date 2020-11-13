@@ -635,6 +635,9 @@
         });
 
       firebase.auth().onAuthStateChanged(function (user) {
+        //TODO: Check if this triggers when native Google auth succeeds
+        console.log("user", user)
+
         if (user) {
           var user_email = user.email;
           var hashed_email = CryptoJS.MD5(user_email).toString();
