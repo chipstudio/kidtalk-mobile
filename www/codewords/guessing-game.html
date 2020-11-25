@@ -436,15 +436,13 @@
 
         function load_recording_url (recording_id) {
             return new Promise(function (resolve, reject) {
-                var get_url = "https://kidtalkdev.web.app" + "/get_recording_url/" + recording_id
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == XMLHttpRequest.DONE) {
-                        resolve(JSON.parse(xhr.responseText))
-                    }
-                }
-                xhr.open('GET', get_url, true);
-                xhr.send(null);
+                var get_recording_url_mobile = firebase.functions().httpsCallable('get_recording_url_mobile');
+                get_recording_url_mobile({recording_id: recording_id}).then(function(result) {
+                    resolve([result.data.url]);
+                }).catch((error) => {
+                    console.log("file: guessing-game.html -> line 449 -> error", error);
+                    reject();
+                });
             })
         }
         

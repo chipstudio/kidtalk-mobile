@@ -602,6 +602,8 @@
     <script src="/libs/firebase/firestore.js"></script>
     <script src="/libs/firebase/init.js"></script>
     <script src="/libs/firebase/storage.js"></script>
+    <script src="/libs/firebase/functions.js"></script>
+
     <script>
       window.db = firebase.firestore();
 
@@ -635,8 +637,6 @@
         });
 
       firebase.auth().onAuthStateChanged(function (user) {
-        //TODO: Check if this triggers when native Google auth succeeds
-        console.log("user", user)
 
         if (user) {
           var user_email = user.email;
@@ -698,7 +698,7 @@
 
                   load_scrapbook(user_model.id, user_model.email);
 
-                  create_security_lookup_record(user_model); //TODO: Create this func
+                  create_security_lookup_record(user_model);
 
                   initialize_audio();
                 });
