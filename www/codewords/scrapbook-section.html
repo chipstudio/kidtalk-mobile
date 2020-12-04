@@ -124,7 +124,7 @@
                     <form name="edit_recording_form" onsubmit="update_edited_recording(event)">
                         <h2 class="edit-recording-tags-title">Icons</h2>
                         <div class="edit-recording-icons">
-                            <input type="text" name="modal_icon_search" placeholder="Search icons..." onkeyup="show_icons_from_string(this.value)" onfocus="add_selected_icons(event)">
+                            <input type="text" name="modal_icon_search" placeholder="Search icons..." onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" onkeyup="show_icons_from_string(this.value)" onfocus="add_selected_icons(event)">
                             <div class="current-icon-selections">{{current_icon_selection}}</div>
                             <div id="view-icons-for-editing"></div>
                         </div>
@@ -496,6 +496,7 @@
         }
 
         .search-options {
+            padding-top: 2px;
             height:0;
             overflow:visible;
             position:relative;

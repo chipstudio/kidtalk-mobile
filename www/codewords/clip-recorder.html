@@ -119,6 +119,7 @@
             autocapitalize="off"
             autocorrect="off"
             onkeyup="search_icons(this.value, true)"
+            onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" 
           ></textarea>
 
           <b id="transcription-instructions"
@@ -130,6 +131,7 @@
             autocapitalize="off"
             autocorrect="off"
             onkeyup="search_icons(this.value, true)"
+            onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" 
           ></textarea>
 
           <icon-searcher></icon-searcher>
