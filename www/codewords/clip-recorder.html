@@ -118,8 +118,7 @@
             spellcheck="false"
             autocapitalize="off"
             autocorrect="off"
-            onkeyup="search_icons(this.value, true)"
-            onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" 
+            onkeyup="if (event.keyCode==13){ $(this).blur(); }else {search_icons(this.value, true)}"
           ></textarea>
 
           <b id="transcription-instructions"
@@ -130,8 +129,7 @@
             spellcheck="false"
             autocapitalize="off"
             autocorrect="off"
-            onkeyup="search_icons(this.value, true)"
-            onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" 
+            onkeyup="if (event.keyCode==13){ $(this).blur(); }else {search_icons(this.value, true)}"
           ></textarea>
 
           <icon-searcher></icon-searcher>

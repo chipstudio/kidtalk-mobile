@@ -61,6 +61,8 @@
         font-family: proxima-soft, sans-serif;
         font-weight: 400;
         font-style: normal;
+        padding-top:constant(safe-area-inset-top);
+        padding-top:env(safe-area-inset-top);
       }
 
       #version-histories b {
@@ -534,6 +536,7 @@
               <textarea
                 style="height: 200px; width: 100%"
                 name="issue-description"
+                onkeyup="if (event.keyCode==13){ $(this).blur(); }"
               ></textarea>
 
               <br /><br />
@@ -548,6 +551,7 @@
               <textarea
                 style="height: 100px; width: 100%"
                 name="issue-repeat"
+                onkeyup="if (event.keyCode==13){ $(this).blur(); }"
               ></textarea>
 
               <input type="submit" class="button" style="border-width: 0" />

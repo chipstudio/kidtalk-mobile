@@ -69,7 +69,7 @@
 		<div id="sign_consent" class="enter-initials">
 			<form name="initials_form" onsubmit="submit_consent(event)">
 				<label for="initials">By signing below and clicking "I Agree", you agree to the terms above:</label>
-				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name"><br/><br/>
+				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name" onkeyup="if (event.keyCode==13){ $(this).blur(); }"><br/><br/>
 				<div class="signing-details">Please Note: Your name is not stored and is only for signing purposes</div>
 				<input type="submit" name="agree_consent" value="I Agree">
 			</from>
@@ -78,7 +78,7 @@
 		<div id="sign_consent_adult" class="enter-initials" style="display:none">
 			<form name="initials_form" onsubmit="submit_adult_consent(event)">
 				<label for="initials">By signing below and clicking "I Agree", <div id="adult-name" class="adult-name" ></div> agrees to the terms above:</label>
-				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name"><br/><br/>
+				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name" onkeyup="if (event.keyCode==13){ $(this).blur(); }"><br/><br/>
 				<div class="signing-details">Please Note: <div class="adult-name" id="adult-name2"></div> name is not stored and is only for signing purposes</div>
 				<input type="submit" name="agree_consent" value="I Agree">
 			</from>

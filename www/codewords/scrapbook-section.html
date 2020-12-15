@@ -13,6 +13,7 @@
             <!-- Search by Phrase -->
             <div id="search-recordings">
                 <input type="text" name="search_recordings" 
+                    onkeyup="if (event.keyCode==13){ $(this).blur(); }"
                     placeholder="Search for phrase" id="search_recordings_text">
                 <button class="search-button" onclick="enter_search(event)">Go!</button>
             </div>
@@ -44,6 +45,7 @@
                     <label class="custom-checkbox-container scrapbook-checkbox-container">
                         <label for="only_no_transcription">Only clips with no label</label>
                         <input type="checkbox" name="only_no_transcription" id="only_no_transcription"
+                            onkeyup="if (event.keyCode==13){ $(this).blur(); }"
                             onchange="enter_search(event)">
                         <span class="custom-checkmark"></span>
                     </label>
@@ -124,13 +126,13 @@
                     <form name="edit_recording_form" onsubmit="update_edited_recording(event)">
                         <h2 class="edit-recording-tags-title">Icons</h2>
                         <div class="edit-recording-icons">
-                            <input type="text" name="modal_icon_search" placeholder="Search icons..." onkeypress="if (event.keyCode==13){ $(this).blur(); return false;}" onkeyup="show_icons_from_string(this.value)" onfocus="add_selected_icons(event)">
+                        <input type="text" name="modal_icon_search" placeholder="Search icons..." onkeyup="if (event.keyCode==13){ $(this).blur(); } else {show_icons_from_string(this.value)}" onfocus="add_selected_icons(event)">
                             <div class="current-icon-selections">{{current_icon_selection}}</div>
                             <div id="view-icons-for-editing"></div>
                         </div>
                         <h2 class="edit-transcription">Edit Label</h2>
                         <input type="text" name="clip_id" value={{id}} style="display:none;">
-                        <input type="text" name="edited_transcription" value={{transcription}}>
+                        <input type="text" name="edited_transcription" value={{transcription}} onkeyup="if (event.keyCode==13){ $(this).blur(); }">
                         <div class="recording-more-edit-options">
                             <h2 class="edit-recording-tags-title">Tag Users</h2>
                             <div class="edit-recording-tags">
@@ -139,7 +141,7 @@
                             </div>
                             <h2 class="edit-recording-tags-title">Date</h2>
                             <div class="edit-recording-date">
-                                <input type="date" name="edit_recording_date" value="{{recording_date}}">
+                                <input type="date" name="edit_recording_date" value="{{recording_date}}" onkeyup="if (event.keyCode==13){ $(this).blur(); }">
                             </div>
                         </div>
                         <div onclick="expand_edit_options(event)" class="recording-more-edit-options-button">More Options</div> 
@@ -155,7 +157,7 @@
                     <form name="add_comment_form" onsubmit="submit_comment(event)">
                         <h2 class="edit-transcription">Add Comment</h2>
                         <input type="text" name="clip_id" value={{id}} style="display:none;">
-                        <input type="text" name="comment_text">
+                        <input type="text" name="comment_text" onkeyup="if (event.keyCode==13){ $(this).blur(); }">
                         <input type="submit" for="add_comment_form">
                     </form>
                 </div>

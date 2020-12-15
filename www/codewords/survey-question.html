@@ -481,7 +481,7 @@
                     question_obj.question.options, question_obj.id);
             } else if (question_obj.question.type == 'text') {
                 primary_inputs = 
-                    '<input type="text" name="primary_survey_answer">';
+                    '<input type="text" name="primary_survey_answer" onkeyup="if (event.keyCode==13){ $(this).blur(); }">';
             }
             return primary_inputs;
         }

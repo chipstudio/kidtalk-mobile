@@ -5,7 +5,7 @@
         <div id="iconsaver"></div>
         <div id="searcher" onclick="show_search()">
         	<div id="search-icon">+</div>
-			<input onkeyup="search_icons(this.value, true)" class="search-icons" id="search-icons" show="false">
+			<input onkeyup="if (event.keyCode==13){ $(this).blur(); return false}else {search_icons(this.value, true)}" class="search-icons" id="search-icons" show="false">
 		</div>
 		<div id="icons"></div>
 	</template>

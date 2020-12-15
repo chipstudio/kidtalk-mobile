@@ -20,7 +20,9 @@
     "@capacitor/android": "^2.4.2",
     "@capacitor/cli": "^2.4.2",
     "@capacitor/core": "^2.4.2",
-    "@codetrix-studio/capacitor-google-auth": "^2.1.1"
+    "@capacitor/ios": "^2.4.2",
+    "@codetrix-studio/capacitor-google-auth": "^2.1.1",
+    "cordova-plugin-audioinput": "^1.0.2"
   },
   "devDependencies": {
     "browser-resolve": "^2.0.0",

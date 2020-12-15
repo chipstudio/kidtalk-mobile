@@ -43,7 +43,7 @@
                     Transcription
                 </div>
                 <div class="transcription-text">
-                    <textarea id="guess_input" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+                    <textarea id="guess_input" spellcheck="false" autocapitalize="off" autocorrect="off" onkeyup="if (event.keyCode==13){ $(this).blur(); return false;}"></textarea>
                     <br>
                     <button onclick="submit()">Submit Guess</button>
                 </div>
@@ -297,7 +297,7 @@
 
         #trophy-icon {
             position: absolute;
-            top: 15px;
+            top: 35px;
             right: 63px;
             z-index: 3;
             height: 30px;
@@ -306,7 +306,7 @@
 
         #x-icon {
             position: absolute;
-            top: 15px;
+            top: 35px;
             right: 8px;
             z-index: 3;
             height: 30px;
