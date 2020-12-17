@@ -1,6 +1,6 @@
 {
   "name": "kidtalk-mobile",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Mobile app versions of Kidtalk (Android/iOS) via Capacitor",
   "main": "index.js",
   "scripts": {
