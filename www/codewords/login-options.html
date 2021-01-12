@@ -117,7 +117,14 @@
             var provider_obj;
             if (provider == "google") {
                 // provider_obj = new firebase.auth.GoogleAuthProvider()
-                let googleUser = await Capacitor.Plugins.GoogleAuth.signIn();
+                let googleUser;
+                try {
+                    googleUser = await Capacitor.Plugins.GoogleAuth.signIn();
+                } catch (error) {
+                    alert("Caught error!: " + JSON.stringify(error));
+                }
+                console.log("file: login-options.html -> line 121 -> googleUser", JSON.stringify(googleUser));
+                // alert("file: login-options.html -> line 121 -> googleUser" + JSON.stringify(googleUser));
 
                 // We need to register an Observer on Firebase Auth to make sure auth is initialized.
                 var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
@@ -132,6 +139,7 @@
                         console.log("firebase.auth -> result", result);
                     }).catch(function(error) {
                         console.log("unsubscribe -> error", error)
+                        alert("Login error result?: " + JSON.stringify(error));
 
                         // Handle Errors here.
                         var errorCode = error.code;
@@ -144,6 +152,7 @@
                     });
                     } else {
                         console.log('User already signed-in Firebase.');
+                        alert('User already signed-in Firebase.');
                     }
                 });
 
