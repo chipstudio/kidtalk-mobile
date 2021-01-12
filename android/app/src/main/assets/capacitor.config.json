@@ -11,7 +11,7 @@
     "GoogleAuth": {
       "scopes": ["profile", "email"],
       "serverClientId": "125090554030-e7jlmvdj9v55gcbfch1up62f8untq0pl.apps.googleusercontent.com",
-      "forceCodeForRefreshToken" : true
+      "forceCodeForRefreshToken" : false
     },
     "Keyboard": {
       "resize": "body"
