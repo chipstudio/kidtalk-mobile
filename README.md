@@ -1,19 +1,5 @@
 ﻿# kidtalk-mobile
 
-Installation (Node 8.0.0)
------
-- `npm install` from the root of the _/kidtalk/_ project folder
-
-
-Developement
------
-- `npm run serve` to host _source_ folder on port 5000 (and serve Javascript functions on port 5001)
-
-
-Deployment
------
-- `npm run deploy` to deploy _source_ folder and Javascript functions
-
 
 Tech Stack:
 -----
