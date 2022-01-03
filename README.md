@@ -1,17 +1,23 @@
 # Kidtalk-Mobile (Android Version)
+This is the Android version of KidTalk. For the core web application and iOS versions see:
+
+Web Application version: https://github.com/chipstudio/kidtalk
+
+iOS version: https://github.com/davidchip/kidtalk-ios
  
 Overview
 -----
-KidTalk Android wraps the current webapp into an Ionic 3 wrapper that is then deployed onto Android devices. You can view a breakdown of the additional code in the `android` folder at the base of this repo. KidTalk iOS uses a similarly compatible, Phonegap wrapper.
+KidTalk Android wraps the KidTalk web application into a Capacitor/Ionic wrapper that is then deployed onto Android devices. You can view a breakdown of the additional code in the `android` folder at the base of this repo. KidTalk iOS uses a similarly compatible, Phonegap wrapper.
 
 
 Tech Stack:
 -----
-The Kidtalk Mobile Application versions are built on top of the tech stack that powers the KidTalk Web Application and utilize some of the additional benefits of native applications. The KidTalk Web Application code is built on a tech stack primarily consisting of: 
+The Kidtalk Android Application is built on much of the same tech stack as the core <a href="https://github.com/chipstudio/kidtalk">KidTalk Web Application</a> with the addition of Capacitor/Ionic in order utilize more native functionality and to be distributed as a native application. The tech stack primarily consists of:
 
 1) Google Firebase: Includes a Firebase database, Firestore Security Rules, Firebase Functions, and the Firebase API for queries and authentication.
-2) Codewords: A custom modular frontend framework for organizing the different sections of the application.
-3) Standard HTML, Javascript and CSS used within with individual Codewords.
+2) Codeword: A web-component library for organizing the different sections of the application using custom elements.
+3) Standard HTML, Javascript and CSS used within individual "codewords". See [Codeword Sections](#codewordsections)
+4) Capacitor/Ionic: See [Capacitor / Ionic Framework](#ionicwrapper)
 
 
 Google Firebase:
@@ -33,18 +39,23 @@ The KidTalk Firebase Firestore Security Rules exist in the file:
 
 This file contains basic rules that prevent non-authenticated accounts from accessing the platform or a user from accessing a seperate users data.
 
-The Firebase API is used throughout the entire application to connect with Google Firebase for user authentication, storing recordings, querying data and recordings and more. For more information about the Firebase API please reference the official documentation: https://firebase.google.com/docs/reference
+The Firebase API is used throughout the entire application to connect with Google Firebase for user authentication, storing recordings, querying data and more. For more information about the Firebase API please reference the official documentation: https://firebase.google.com/docs/reference
 
 
-Codeword Sections:
+Codeword Sections: <a name="codewordsections"></a>
 -----
-The frontend code for the KidTalk Web Application is split up into several sections called "Codewords". Codewords is a custom framework which chunks the frontend/app interface code and Firebase database queries into discrete sections where all the code for that section lives. 
+The frontend code for KidTalk is split up into several sections called "codewords". Codewords implement the Codeword library to organize application interface code and associated Firebase queries and API calls into discrete, resusable sections. Codewords range from individual buttons and small widgets to full screen interfaces.
 
-For example, in the application menu you can select the "Say What?" section of the app which will play recordings of children speaking, and you as the user can then submit a guess as to what they are saying. The html, css styles, and javascript code related to the frontend interface and Firebase queries related to this section exist in the file:
+For example, in the application menu you can select the "Say What?" section of the app. This will take you to a screen that will play recordings of children speaking, and you as the user can then submit a guess as to what they are saying. The HTML, CSS styles, and Javascript code related to the frontend interface of "Say What?", as well as the associated Firebase queries and API calls needed for retrieving the recordings exist in the file:
 
-`<YOUR-PROJECT_DIRECTORY>/source/codewords guessing-game.html`
+`<YOUR-PROJECT_DIRECTORY>/source/codewords/guessing-game.html`
 
-Codewords are reusable and as such you will find that some codewords pull in or reference other codewords as sub modules, not unlike other widely used frontend frameworks. 
+Codewords are reusable and as such you will find that some codewords pull in or reference other codewords as sub modules in a similar way to other frontend frameworks. 
+
+
+Capacitor / Ionic Framework <a name="ionicwrapper"></a>
+-----
+KidTalk Android uses Capacitor so that it is possible to use native functionality and to distribute the app as a native Android application. The Ionic Framework can be used with Capacitor although it is not required. To use Capacitor or use the Ionic framework with Capacitor see <a href="https://github.com/ionic-team/capacitor#readme">these instructions</a>. In order to deploy a Capacitor Android App to the Google Play store see <a href="https://capacitorjs.com/docs/android/deploying-to-google-play">this article from the capacitorjs website</a> and <a href="https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/">this other linked article</a>.
 
 
 Summary of Codeword Sections:
@@ -139,4 +150,3 @@ See version-update.html, these work together.
 22) `version-update.html`
 
 Details about the version history of the app accessible from the main menu in "Version History".
-
