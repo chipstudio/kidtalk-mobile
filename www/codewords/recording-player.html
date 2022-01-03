@@ -1,0 +1,22 @@
+<recording-player definition>
+
+	<template>
+		<audio id="playback" controls ontimeupdate="log_time(this)" onloadeddata="log_time(this)"></audio>
+
+        <div class="waveform-container">
+            <div class="eq-container">
+                <div id="playback-current-time"></div>
+                <canvas id="playback-eq" height="100px"></canvas>
+            </div>
+        </div>
+	</template>
+
+	<script>
+        function playback_recording () {
+        	var playback_player = doc.get_id("playback")
+            playback_player.src = window.playback_src
+            playback_player.play()
+        }
+	</script>
+
+</recording-player>

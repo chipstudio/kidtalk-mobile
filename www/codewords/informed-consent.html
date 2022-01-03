@@ -1,0 +1,250 @@
+<informed-consent definition>
+	<template>
+		<div class="summary-of-consent">
+			<div id="other-adult"></div>
+			<div>
+				<b>Summary of what you are agreeing to for this study:</b>
+			</div><br/>
+			<ul>
+				<li>Your participation is completely voluntary and you may stop participating at any time.</li>
+				<li>Anonymous recordings, responses, and transcripts of you and your child's conversation will be shared with research databases.</li>
+				<li>We store basic information such as birth month, birth year, and zipcodes for research purposes, as well as email addresses for login.</li>
+			</ul><br/>
+			<div>
+				<b>Below is the full text of your consent to participate:</b>
+			</div>
+		</div>
+		<div class="informed-consent-text">
+			<strong>Statement of Consent</strong><br/>
+			Please check all that apply (optional). I will allow for:<br/><div class="form-spacer"></div>
+			<form id="consent_checks">
+			<input name="share_audio_research_dbs" type="checkbox" checked="true"> Anonymous audio recordings of me and my child's conversation to be shared with research databases.<br/>
+			<input name="share_transcript_research_dbs" type="checkbox" checked="true"> Anonymous transcripts of me and my child's conversation to be
+			shared with publicly available research databases.<br/>
+			<input name="share_audio_guess_the_word" type="checkbox" checked="true"> Anonymous audio recordings of audio recordings of my child’s speech to be used in this app’s “Say What?” game.<br/>
+			<input name="share_survey_research_dbs" type="checkbox" checked="true"> Anonymous responses to surveys about my family to be shared with other researchers.<br/><br/>
+			</form>
+			You can update your consent for all of these at any time by changing your privacy settings on the app. By using this app, you indicate that:<br/>
+			• You are at least 18 years of age.<br/>
+			• You have read this consent form or have had it read to you.<br/>
+			• Your questions have been answered to your satisfaction.<br/>
+			• You agree to have you and your child participate in this study.<br/>
+			• You can see a copy of this consent form through the app at any time.<br/><br/>
+
+			<strong>CONSENT TO PARTICIPATE:</strong><br/><br/>
+
+			<strong>Project Title</strong><br/>
+			KidTalk: Language Scrapbooking for Science<br/><br/>
+  
+			<strong>Purpose of the Study</strong><br/>
+			This research is being conducted by Professor Yi Ting Huang at the University of Maryland, College Park and Professor Joshua Hartshorne at Boston College. We are studying how children’s language learning is impacted by social disruptions from COVID-19.<br/><br/>
+			<strong>Procedures</strong><br/>
+			You and your child will be asked to contribute information about your interactions using this scrapbooking app. For the next 6 months, we are asking thousands of families like yours to carry out the following tasks (with about how long they take):<br/><br/>
+			• Provide speech recordings (3-5 times a week, about 2 minutes)<br/>
+			• Transcribe interactions into text (3-5 times a week, about 5 minutes)<br/>
+			• Guess what children say in a game (1 time a week, about 5 minutes)<br/>
+			• Answer questions about your family (2 times a week, about 2 minutes)<br/>
+			• Provide city/state location of interactions (3-5 times a week, 1 minute)<br/><br/>
+			Over time, this app will build a scrapbook of your child’s developing speech, which you can track and revisit. By measuring how speech changes across many children, we will better understand the impacts of COVID-19 policies on children’s language-learning environments and development. This study will last 6 months, but you can continue beyond this time point. You can do these tasks any number of times, including once. You can decide how your data will be shared. There is no payment for participation.<br/><br/>
+			<strong>Potential Risks and Discomforts</strong><br/>
+			We do not anticipate any known risks to you or your child beyond those you would encounter in your everyday lives. All tasks are short so they are unlikely to upset or bore. There is a risk of breach of confidentiality, but we take steps to mitigate this (see Confidentiality below).<br/><br/>
+			<strong>Potential Benefits</strong><br/>
+			The study is not designed to help you personally. However, this app will make a scrapbook of your child’s speech, which you can keep and may find rewarding. Results from this study may inform educators and policymakers and lead to policies to support families during social/economic adversity.<br/><br/>
+			<strong>Confidentiality</strong><br/>
+			Your data will be associated with an alphanumeric code, which will not be connected to you or your device. You and your child will never be identified by name. It is possible that someone could recognize your voice from audio recordings, but long-term experience suggests that this is unlikely.<br/>
+			You can decide how your data can be shared (see Consent below). If you decide to stop sharing your data at any point, we will not share any new data, or any data we have not yet shared. However, we are unable to remove already-shared data from the public domain.<br/><br/>
+
+			Your child’s information may be shared with representatives of the University of Maryland, College Park or governmental authorities if your child or someone else is in danger or if we are required to do so by law.<br/><br/>
+			<strong>Right to Withdraw and Questions</strong><br/>
+			Your participation is completely voluntary. You may stop participating at any time. If you have questions, concerns, or complaints, or if you need to report an injury related to the research, please contact the investigator:<br/><br/>
+			Yi Ting Huang, at 301-405-4227 or ythuang1@umd.edu.<br/><br/>
+			Participant Rights<br/>
+			If you have questions about your rights as a research participant or wish to report a research-related injury, please contact: <br/><br/>
+
+			University of Maryland College Park, Institutional Review Board Office<br/>
+			1204 Marie Mount Hall, College Park, Maryland, 20742<br/>
+			E-mail: irb@umd.edu, Telephone: 301-405-0678<br/><br/>
+			For more information regarding participant rights, please visit: https://research.umd.edu/irb-research-participants. This research has been reviewed according to the University of Maryland, College Park IRB procedures for research involving human subjects.<br/><br/>
+		</div>
+		<div id="sign_consent" class="enter-initials">
+			<form name="initials_form" onsubmit="submit_consent(event)">
+				<label for="initials">By signing below and clicking "I Agree", you agree to the terms above:</label>
+				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name" onkeyup="if (event.keyCode==13){ $(this).blur(); }"><br/><br/>
+				<div class="signing-details">Please Note: Your name is not stored and is only for signing purposes</div>
+				<input type="submit" name="agree_consent" value="I Agree">
+			</from>
+		</div>
+
+		<div id="sign_consent_adult" class="enter-initials" style="display:none">
+			<form name="initials_form" onsubmit="submit_adult_consent(event)">
+				<label for="initials">By signing below and clicking "I Agree", <div id="adult-name" class="adult-name" ></div> agrees to the terms above:</label>
+				<input type="text" name="initials" id="initials" placeholder="Sign by typing your name" onkeyup="if (event.keyCode==13){ $(this).blur(); }"><br/><br/>
+				<div class="signing-details">Please Note: <div class="adult-name" id="adult-name2"></div> name is not stored and is only for signing purposes</div>
+				<input type="submit" name="agree_consent" value="I Agree">
+			</from>
+		</div>
+	</template>
+	<style>
+		.adult-name {
+			display:inline;
+		}
+		.form-spacer {
+			margin-bottom:10px;
+		}
+		.informed-consent-text {
+			border:2px solid #ccc;
+			border-radius:5px;
+			max-height:20vh;
+			overflow:scroll;
+			padding:10px;
+			line-height:20px;
+			margin-bottom:20px;
+		}
+		input[name="initials"] {
+			border:2px solid #ccc;
+			border-radius:5px;
+			box-sizing:border-box;
+			height:3.2rem;
+			line-height:3.2rem;
+			padding:5px;
+			font-family:"proxima-soft";
+			font-size:1.6rem;
+			margin-top:20px;
+			width:100%;
+		}
+		input[type="submit"][name="agree_consent"]{
+            background:#FF7648;
+            border:none;
+            border-radius:10px;
+            color:white;
+            height:4.0rem;
+            margin-top:20px;
+            bottom:0;
+            outline:none;
+            padding:12px 15px;
+            font-size:1.4rem;
+            width:100%;
+        }
+        label {
+			line-height:20px;
+		}
+		.signing-details {
+			font-size:1.0rem;
+			line-height:1.2rem;
+			text-align:center;
+		}
+        strong {
+			font-weight:700;
+		}
+		.summary-of-consent {
+			padding:20px;
+			line-height:20px;
+			margin-bottom:10px;
+		}
+
+			.summary-of-consent b {
+				color:#FF7648;
+				font-weight:700;
+				font-size:1.3rem;
+				line-height:1.3em;
+			}
+
+			.summary-of-consent ul {
+				list-style-type:square;
+				margin-left:20px;
+			}
+
+				.summary-of-consent ul li {
+					margin-bottom:10px;
+				}
+		
+		.summary-of-consent,
+		.informed-consent-text,
+		#sign_consent,
+		#sign_consent_adult {
+			max-width:960px;
+			margin-left:auto;
+			margin-right:auto;
+		}
+	</style>
+	<script type="text/javascript">
+		function load_informed_consent (user_id) {
+			var sharing_consent_form = false;
+			data.get_model_id("User", user_id).then(function(user) {
+				if (!sharing_consent_form && 
+					(user.has_initialed == true || user.has_initialed == "true")) {
+					doc.get_id('sign_consent').style.display = 'none'
+					doc.get_class('informed-consent-text')[0].style.maxHeight = '30vh'
+				} else {
+					doc.get_id('sign_consent').style.display = 'block'
+				}
+			}).catch(function(error) {
+				console.log(error)
+			})
+		}
+
+		function submit_consent (event) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			var user_id = window.user_id;
+			var user_obj = window.user;
+
+			/* Grab Data from Consent Checks */
+			var check_form = doc.get_id("consent_checks");
+			var consent_data = doc.serialize(check_form);
+			var consent_keys = [
+				'share_audio_research_dbs', 
+				'share_transcript_research_dbs', 
+			 	'share_audio_guess_the_word', 
+			 	'share_survey_research_dbs'];
+
+			 /* Set undefined, unchecked to false */
+			consent_keys.forEach(function (key) {
+				if (consent_data[key] == null ||
+					consent_data[key] == undefined ||
+					consent_data[key] == "") {
+					consent_data[key] = false;
+				}
+			});
+
+			/* If signed with initials, continue */
+			var initials = doc.get_id("initials");
+
+			if (initials.value == null ||
+				initials.value == undefined ||
+				initials.value == "") {
+			} else {
+				user_obj["has_initialed"] = true
+				/* Update User settings with sharing settings */
+				Object.keys(consent_data).forEach(function(key) {
+					user_obj[key] = consent_data[key];
+				})
+
+				if (user_obj.hasOwnProperty("avatar_url") == true) {
+					delete user_obj.avatar_url
+				}
+
+				data.update_model("User", user_id, user_obj)
+					.then(function(updated_user) {
+						load_settings(window.user_id);
+						doc.navigate("/settings");
+				}).catch(function(error) {
+					console.log(error);
+
+					/* Error Handling Here */
+				});
+			}
+		}
+
+		function submit_adult_consent (event) {
+			event.stopPropagation()
+			event.preventDefault()
+			
+			window.adult_model.has_initialed = true
+			data.create_model("TaggedAdult", window.adult_model)
+			doc.navigate("/family-management")
+			return
+		}
+	</script>
+</indormed-consent>

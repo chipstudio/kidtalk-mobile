@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>KidTalk</title>
+    <script src="/doc.js?t=9_2"></script>
+    <script src="/data.js?t=9_2"></script>
+    <script src="/models.js?t=9_2"></script>
+    <script src="https://codeword.it"></script>
+    <link rel="stylesheet" href="/reset.css" />
+    <link rel="stylesheet" href="/polyfills/rangeslider.css" />
+    <link rel="stylesheet" href="https://use.typekit.net/sav4wzk.css" />
+    <link rel="icon" type="image/png" href="/images/Logo/favicon.png" />
+    <link href="/libs/fontawesome.css" rel="stylesheet" />
+    <script src="/libs/fontawesome_list.js"></script>
+    <!-- demo -->
+    <!-- <meta name="google-signin-client_id" content="744254868856-6j8dflcgq0tiqt0b506b61etukcq3rdm.apps.googleusercontent.com"> -->
+
+    <!-- kidtalk-staging ios? -->
+    <!-- <meta name="google-signin-client_id" content="125090554030-dbuoa56rkt6tcnj7pjoealv1srluoj30.apps.googleusercontent.com"> -->
+
+    <!-- kidtalkdev -->
+    <!-- <meta name="google-signin-client_id" content="271962176686-vv4j0dih9f76voln1a6doh6nll3akknd.apps.googleusercontent.com"> -->
+
+    <!-- kidtalk-staging (android) -->
+    <meta name="google-signin-client_id" content="125090554030-e7jlmvdj9v55gcbfch1up62f8untq0pl.apps.googleusercontent.com">
+    <!-- <meta name="google-signin-client_id" content="125090554030-44m242e6sncoluiqbptqlauop0cu4m3f.apps.googleusercontent.com"> -->
+    
+  
+
+    <script src="./bundle.js"></script>
+
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <script>
+      if (!window.MediaRecorder) {
+        document.write(
+          decodeURI(
+            '%3Cscript defer src="/polyfills/MediaRecorder.js">%3C/script>'
+          )
+        );
+      }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-91592412-8"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-91592412-8");
+    </script>
+    <script src="/polyfills/rangeslider.js"></script>
+    <style>
+      body {
+        font-family: proxima-soft, sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        padding-top:constant(safe-area-inset-top);
+        padding-top:env(safe-area-inset-top);
+      }
+
+      #version-histories b {
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 700;
+        padding-top: 20px;
+      }
+
+      #version-histories i {
+        display: block;
+        font-size: italic;
+        padding-bottom: 10px;
+      }
+
+      #version-histories li {
+        list-style-type: square;
+        margin-left: 25px;
+      }
+
+      #mode {
+        color: #aaa;
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        padding-top: 20px;
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        display: none;
+        text-transform: uppercase;
+      }
+
+      body[authed="true"] .main-menu {
+        display: block;
+      }
+
+      body[authed="false"] .login {
+        display: block;
+      }
+
+      #menu {
+        background-color: #fff;
+        bottom: 0;
+        box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.2);
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100);
+        overflow-y: scroll;
+        transition: transform 400ms cubic-bezier(0.175, 0.585, 0.32, 1.275);
+        transform: translateX(-100%);
+        width: 80vw;
+        z-index: 2;
+      }
+
+      #modal-container[modal-size="small"] {
+        margin: 10px auto;
+        padding: 15px;
+        min-height: 0;
+      }
+
+      #modal-container[modal-size="small"] .modal-close {
+        display: none;
+      }
+
+      #modal-container[modal-size="small"] #modal-content .notification {
+        font-size: 1rem;
+        padding: 0;
+      }
+
+      #menu-icon[show="true"] + #menu {
+        transform: translateX(0%);
+      }
+
+      #app-pages {
+        transition: opacity 0.2s ease-in-out;
+      }
+
+      #menu-icon[show="true"] + #menu + #app-pages {
+        opacity: 0.1;
+      }
+
+      #warning {
+        color: #fff;
+        position: fixed;
+        background-color: rgba(255, 0, 0, 0.8);
+        bottom: 10px;
+        left: 10px;
+        display: none;
+        right: 10px;
+        box-sizing: border-box;
+        padding: 10px 20px;
+        text-align: center;
+        line-height: 20px;
+        z-index: 4;
+      }
+
+      #warning[show="true"] {
+        display: block;
+      }
+
+      #menu-icon {
+        background-color: #f4ece1;
+        border-radius: 50%;
+        position: fixed;
+        box-sizing: border-box;
+        top: 32px;
+        left: 15px;
+        z-index: 3;
+        padding: 10px;
+        height: 50px;
+        width: 50px;
+      }
+
+      #menu-icon svg {
+        height: auto;
+        width: 100%;
+      }
+
+      .menu-text {
+        display: inline-block;
+      }
+
+      #menu .menu-link {
+        border-bottom: 2px solid #ff7648;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: none;
+        padding: 20px 15px;
+        font-size: 1.4rem;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      #menu .menu-link[link="/login"],
+      #menu .menu-link[link="/record"] {
+        padding-top: 80px;
+      }
+
+      .menu-link img {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 3px;
+        vertical-align: middle;
+        height: 40px;
+        width: auto;
+      }
+
+      body[authed="false"] #menu .menu-link.unauthed {
+        display: block;
+      }
+
+      body[authed="true"] #menu .menu-link.authed {
+        display: block;
+      }
+
+      .custom-select {
+        display: block;
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        color: #444;
+        line-height: 1.3;
+        padding: 0.6em 1.4em 0.5em 0.8em;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        border: 1px solid #aaa;
+        box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+        border-radius: 0.5em;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #fff;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"),
+          linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+        background-repeat: no-repeat, repeat;
+        background-position: right 0.7em top 50%, 0 0;
+        background-size: 0.65em auto, 100%;
+      }
+      .custom-select::-ms-expand {
+        display: none;
+      }
+      .custom-select:hover {
+        border-color: #888;
+      }
+      .custom-select:focus {
+        border-color: #aaa;
+        box-shadow: 0 0 1px 3px rgba(59, 153, 252, 0.7);
+        box-shadow: 0 0 0 3px -moz-mac-focusring;
+        color: #222;
+        outline: none;
+      }
+      .custom-select option {
+        font-weight: normal;
+      }
+
+      .notification {
+        padding: 20px 0 30px 0;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.6rem;
+      }
+
+      .custom-checkbox-container.other {
+        margin-top: 30px;
+        margin-bottom: 30px;
+      }
+
+      .field-wrapper:first-child .custom-checkbox-container.other {
+        margin-top: 0;
+      }
+
+      #modal-close[hide-close="true"] {
+        display: none;
+      }
+
+      .avatar {
+        height: 50px;
+        width: 50px;
+        border: 2px solid transparent;
+        border-radius: 50%;
+      }
+
+      .avatar[selected="true"] {
+        border: 2px solid #000;
+      }
+
+      .avatars {
+        padding-top: 15px;
+        text-align: center;
+      }
+
+      .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: left;
+        padding-left: 5px;
+        padding-bottom: 5px;
+        font-size: 0.7rem;
+        font-weight: 200;
+      }
+    </style>
+
+    <script>
+      function select_avatar(el) {
+        doc.each_class("hidden-avatar", function (hidden_avatar) {
+          hidden_avatar.remove();
+        });
+
+        doc.clear_class_attr("avatar", "selected");
+        el.setAttribute("selected", true);
+
+        var new_hidden_avatar = doc.create_el("input", {
+          type: "hidden",
+          className: "hidden-avatar",
+          name: el.getAttribute("data-name"),
+          value: el.getAttribute("data-value"),
+        });
+        el.parentNode.insertBefore(new_hidden_avatar, el);
+      }
+
+      function show_page(page) {
+        doc.clear_class_attr(page.className, "selected");
+        page.setAttribute("selected", true);
+      }
+
+      function authed(state) {
+        document.body.setAttribute("authed", state);
+      }
+
+      function logout() {
+        firebase.auth().signOut();
+      }
+
+      function toggle_menu(menu) {
+        if (menu.getAttribute("show") == "true") {
+          menu.setAttribute("show", false);
+        } else {
+          menu.setAttribute("show", true);
+        }
+      }
+
+      function start_history(history) {
+        var pushState = history.pushState;
+        history.pushState = function (state) {
+          if (typeof history.onpushstate == "function") {
+            history.onpushstate({ state: state });
+          }
+
+          return pushState.apply(history, arguments);
+        };
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="warning"></div>
+
+    <div class="modal-container">
+      <div class="modal-content" id="modal-container">
+        <div class="modal-close" id="modal-close" onclick="doc.close_modal()">
+          <svg-close></svg-close>
+        </div>
+
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+    <div id="menu-icon" onclick="toggle_menu(this)">
+      <svg
+        width="100pt"
+        height="100pt"
+        version="1.1"
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g>
+          <path
+            d="m63.801 44.5h-44.801c-3 0-5.5 2.5-5.5 5.5s2.5 5.5 5.5 5.5h44.898c3 0 5.5-2.5 5.5-5.5-0.097657-3.1016-2.5-5.5-5.5977-5.5z"
+          />
+          <path
+            d="m81.301 13h-62.301c-3 0-5.5 2.5-5.5 5.5s2.5 5.5 5.5 5.5h62.398c3 0 5.5-2.5 5.5-5.5-0.097657-3-2.5-5.5-5.5977-5.5z"
+          />
+          <path
+            d="m81.301 75.898h-62.301c-3 0-5.5 2.5-5.5 5.5s2.5 5.5 5.5 5.5h62.398c3 0 5.5-2.5 5.5-5.5-0.097657-3-2.5-5.5-5.5977-5.5z"
+          />
+        </g>
+      </svg>
+    </div>
+
+    <div id="menu">
+      <app-link link-="/login" class-="menu-link unauthed">
+        <text->Login</text->
+      </app-link>
+      <app-link link-="/record" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/buttons/KidTalk_Record.svg" />
+          Record</text-
+        >
+      </app-link>
+      <app-link link-="/guess" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/buttons/KidTalk_Guess.svg" />
+          Say What?</text-
+        >
+      </app-link>
+      <app-link link-="/scrapbook" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/buttons/KidTalk_Scrapbook.svg" />
+          Scrapbook</text-
+        >
+      </app-link>
+      <app-link link-="/family-management" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/Logo/KidTalk_Logo.svg" />
+          My Family</text-
+        >
+      </app-link>
+      <app-link link-="/settings" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/buttons/KidTalk_Settings.svg" />
+          Settings
+        </text->
+      </app-link>
+      <app-link link-="/consent" class-="menu-link authed">
+        <text->
+          <img src="/images/SVG/buttons/KidTalk_Help.svg" />
+          <div class="menu-text">Consent Form</div></text-
+        >
+      </app-link>
+      <app-link link-="/report" class-="menu-link authed">
+        <text-> Report an Issue </text->
+      </app-link>
+      <app-link link-="/messages" class-="menu-link authed">
+        <text-> Message from the Scientists </text->
+      </app-link>
+      <app-link link-="/versions" class-="menu-link authed">
+        <text-> Version History </text->
+      </app-link>
+      <app-link link-="/logout" class-="menu-link authed">
+        <text->Logout</text->
+      </app-link>
+    </div>
+
+    <div id="app-pages">
+      <div id="notify"></div>
+      <app-page>
+        <url->/login</url->
+        <content->
+          <login-options></login-options>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/home</url->
+        <content->
+          <home-page></home-page>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/record</url->
+        <content->
+          <clip-recorder></clip-recorder>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/guess</url->
+        <content->
+          <guessing-game></guessing-game>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/scrapbook</url->
+        <content->
+          <scrapbook-section></scrapbook-section>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/family-management</url->
+        <content->
+          <family-management></family-management>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/settings</url->
+        <content->
+          <configure-settings></configure-settings>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/consent</url->
+        <content->
+          <informed-consent></informed-consent>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/update</url->
+        <content->
+          <version-update></version-update>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/player</url->
+        <content->
+          <recording-player></recording-player>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/report</url->
+        <content->
+          <div style="max-width: 640px; margin: 0 auto">
+            <div
+              style="
+                font-size: 1.4rem;
+                font-weight: 700;
+                margin-top: 15px;
+                margin-bottom: 15px;
+              "
+            >
+              Report an Issue
+            </div>
+            <form
+              method="post"
+              action="https://formbucket.com/f/buk_0YkGTDtgBT5kjVTLGFPw9iqm"
+            >
+              <label>What issue did you encounter?</label>
+              <textarea
+                style="height: 200px; width: 100%"
+                name="issue-description"
+                onkeyup="if (event.keyCode==13){ $(this).blur(); }"
+              ></textarea>
+
+              <br /><br />
+
+              <input
+                name="_next"
+                type="hidden"
+                value="https://staging.kidtalk.app"
+              />
+
+              <label>What steps can we take to repeat this issue?</label>
+              <textarea
+                style="height: 100px; width: 100%"
+                name="issue-repeat"
+                onkeyup="if (event.keyCode==13){ $(this).blur(); }"
+              ></textarea>
+
+              <input type="submit" class="button" style="border-width: 0" />
+            </form>
+          </div>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/messages</url->
+        <content->
+          <message-scientists></message-scientists>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/versions</url->
+        <content->
+          <version-history></version-history>
+          <div id="version_history"></div>
+        </content->
+      </app-page>
+      <app-page>
+        <url->/logout</url->
+        <content-> Logout </content->
+      </app-page>
+    </div>
+
+    <div class="footer" style="background-color: #fff">
+      <span id="latest-version"></span> <span id="footer-email"></span>
+    </div>
+
+    <survey-question></survey-question>
+
+    <template id="custom-checkbox">
+      <label class="custom-checkbox-container other">
+        <input
+          type="checkbox"
+          name="{{name}}"
+          value="true"
+          {{checked}}
+          onclick="toggle_checkbox(this)"
+        />
+        <span class="custom-checkmark"></span>
+        <label for="name">{{display_name}}</label>
+      </label>
+    </template>
+
+    <div id="mode"></div>
+    <script type="text/javascript" src="/libs/CryptoJS.js"></script>
+    <script src="/libs/firebase/app.js"></script>
+    <script src="/libs/firebase/analytics.js"></script>
+    <script src="/libs/firebase/auth.js"></script>
+    <script src="/libs/firebase/firestore.js"></script>
+    <script src="/libs/firebase/init.js"></script>
+    <script src="/libs/firebase/storage.js"></script>
+    <script src="/libs/firebase/functions.js"></script>
+
+    <script>
+      window.db = firebase.firestore();
+
+      if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+        var email = window.localStorage.getItem("emailForSignIn");
+        if (!email) {
+          email = window.prompt("Please provide your email for confirmation");
+        }
+
+        firebase
+          .auth()
+          .signInWithEmailLink(email, window.location.href)
+          .then(function (result) {
+            window.localStorage.removeItem("emailForSignIn");
+          })
+          .catch(function (error) {});
+      }
+
+      firebase
+        .auth()
+        .getRedirectResult()
+        .then(function (result) {
+          console.log(result);
+        })
+        .catch(function (error) {
+          if (error.code == "auth/account-exists-with-different-credential") {
+            doc.render_modal(
+              "<div style='font-size:1.4rem; font-weight:700; text-align:center'>Account exists with different login provider.</div>"
+            );
+          }
+        });
+
+      firebase.auth().onAuthStateChanged(function (user) {
+
+        if (user) {
+          var user_email = user.email;
+          var hashed_email = CryptoJS.MD5(user_email).toString();
+
+          var user_obj = {
+            email: hashed_email,
+          };
+
+          window.user_email = hashed_email;
+
+          doc.get_id("footer-email").textContent =
+            "(Logged in as " + user.email + ")";
+
+          data
+            .get_or_create("User", ["email", "==", hashed_email], user_obj)
+            .then(function (user_id) {
+              window.user_id = user_id;
+
+              load_informed_consent(window.user_id);
+              load_settings(window.user_id);
+              load_family_management(window.user_id);
+              load_recordings();
+              load_version_history();
+              loadUpdate();
+
+              data
+                .get_model_including_id("User", window.user_id)
+                .then(function (user_model) {
+                  window.user = user_model;
+                  if (
+                    window.user.last_version_seen != window.currentVersion &&
+                    window.user.has_initialed == true
+                  ) {
+                    doc.navigate("/update");
+                  } else if (
+                    !user_model.has_initialed ||
+                    user_model.has_initialed != true
+                  ) {
+                    doc.navigate("/consent");
+                  } else {
+                    load_survey_question(user_model);
+                  }
+
+                  if (user_model.hasOwnProperty("parent_avatar") == true) {
+                    window.user_avatar = user_model.parent_avatar;
+                  } else {
+                    window.user_avatar = null;
+                  }
+
+                  if (
+                    !user.hasOwnProperty("share_audio_guess_the_word") ||
+                    user.share_audio_guess_the_word != true
+                  ) {
+                    window.allow_sharing = false;
+                  } else {
+                    window.allow_sharing = true;
+                  }
+
+                  load_scrapbook(user_model.id, user_model.email);
+
+                  create_security_lookup_record(user_model);
+
+                  initialize_audio();
+                });
+
+              data.subscribe_collection("Guess", {
+                query: function (query) {
+                  return query
+                    .where("user_id", "==", window.user_id)
+                    .where("correct", "==", true);
+                },
+                update: function (correct_guesses) {
+                  doc.get_id("counter").textContent = correct_guesses.length;
+                },
+              });
+            });
+
+          authed(true);
+
+          load_messages();
+
+          window.onpopstate({ state: window.location.pathname });
+
+          if (
+            window.location.pathname == "" ||
+            window.location.pathname == "/login" ||
+            window.location.pathname == "/"
+          ) {
+            doc.navigate("/home");
+          }
+        } else {
+          authed(false);
+          doc.navigate("/login");
+        }
+      });
+
+      if (!navigator.mediaDevices) {
+        document.body.setAttribute("fallback", true);
+      }
+
+      function update_vh() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
+      }
+
+      doc.loaded(function () {
+        // mobile chrome
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+          var is_chrome = navigator.userAgent.match("CriOS");
+          if (is_chrome) {
+            doc.get_id("warning").setAttribute("show", "true");
+            doc.get_id("warning").innerHTML =
+              "Warning: For an optimal recording experience, we recommend using Safari on iOS, or Google Chrome on Android.";
+          }
+        }
+
+        update_vh();
+      });
+
+      window.addEventListener("resize", () => {
+        update_vh();
+      });
+
+      start_history(window.history);
+
+      function toggle_checkbox(checkbox) {
+        if (checkbox.hasAttribute("checked")) {
+          checkbox.removeAttribute("checked");
+        } else {
+          checkbox.setAttribute("checked", "");
+        }
+      }
+
+      /**
+       * Create lookup doc in db.
+       *
+       * @return Null
+       */
+      function create_security_lookup_record(user_model) {
+
+        var lookup_obj =  {
+          user_id : user_model.id
+        }
+        data.get_or_create("Lookup",["user_id", "==", user_model.id], lookup_obj, null, firebase.auth().currentUser.uid);
+      }
+    </script>
+  </body>
+</html>

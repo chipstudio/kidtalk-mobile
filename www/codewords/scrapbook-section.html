@@ -1,0 +1,2756 @@
+<scrapbook-section definition>
+    
+    <template>
+        <div class="scrapbook-container">
+
+            <div class="search-options">
+                <!-- Toggle Search Filters -->
+                <div id="toggle-display-options" onclick="toggle_display_options(event)">+ More Options</div>
+                <!-- Clear Search -->
+                <div id="clear-search" onclick="clear_search(event)"><span>&#10005;</span><span> Clear Search</span></div>
+            </div>
+
+            <!-- Search by Phrase -->
+            <div id="search-recordings">
+                <input type="text" name="search_recordings" 
+                    onkeyup="if (event.keyCode==13){ $(this).blur(); }"
+                    placeholder="Search for phrase" id="search_recordings_text">
+                <button class="search-button" onclick="enter_search(event)">Go!</button>
+            </div>
+
+            <div id="search-filter-options">
+                <!-- Search Filters -->
+                <div id="search-filters">
+                    <label for="display_by">Display</label>
+                    <select id="filter_scrapbook" onchange="filter_recordings(event)" class="custom-select">
+                        <template id="tagged_child_option">
+                            <option id="child_recordings_{{id}}" value="child_recordings_{{id}}"></option>
+                        </template>
+                        <template id="tagged_adult_option">
+                            <option id="tagged_adult_recordings_{{id}}" value="tagged_adult_recordings_{{id}}"></option>
+                        </template>
+                        <optgroup label="General Options">
+                            <option id="all_recordings" value="all_recordings" selected="true">
+                                All Clips
+                            </option>
+                            <option id="my_recordings" value="my_recordings">
+                                Clips I Recorded
+                            </option>
+                        </optgroup>
+                        <optgroup id="tagged_children_options" label="Tagged Children" loaded-names="false">
+                        </optgroup>
+                        <optgroup id="tagged_adults_options" label="Tagged Adults" loaded-names="false">
+                        </optgroup>
+                    </select>
+                    <label class="custom-checkbox-container scrapbook-checkbox-container">
+                        <label for="only_no_transcription">Only clips with no label</label>
+                        <input type="checkbox" name="only_no_transcription" id="only_no_transcription"
+                            onkeyup="if (event.keyCode==13){ $(this).blur(); }"
+                            onchange="enter_search(event)">
+                        <span class="custom-checkmark"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Show Options -->
+            <div class="show-options">
+                <!-- <span>SHOW</span> -->
+                <span show-type="clips" onclick="show_only_recording_type(event)" class="show-option show-clip">Snippets</span>
+                <span show-type="conversation" onclick="show_only_recording_type(event)" class="show-option show-conversations">Conversations</span>
+                <span show-type="picture" onclick="show_only_recording_type(event)" class="show-option show-picture">Pictures</span>
+            </div>
+
+            <!-- Recordings Timeline -->
+            <div id="recordings-timeline">
+
+                <!-- Recording Template -->
+                <template id="timeline-recording">
+                    <div class="timeline-element-container minimize {{tile_type}} {{date_header_class}}">
+                        <div class="{{time_period_class}}">{{time_period_text}}</div>
+                        <div class="recording-container minimize {{tile_type}}" onclick="expand_tile(event)" id="{{id}}" processed="{{processed}}">
+                            <div class="alert-bubble" style="display:{{alert_display}}">{{number_of_alerts}}</div>
+                            <div class="mini-bg" style="background-image:url('/images/elicited/{{cimg}}.jpg'); background-size: auto 120%; background-repeat: no-repeat; background-position: center center;" >
+                                <div class="header">
+                                    <div class="recording-date-info truncated minimize">
+                                        <div class="recording-date">
+                                            {{date_of_recording}}
+                                        </div>
+                                        <!-- <div class="recording-day-time">{{day_and_time}}</div> -->
+                                    </div>
+                                    <div class="tagged-user-info">
+                                        <div class="recording-child-age truncated minimize">{{child_age}}</div>
+                                        <div class="tagged-users-section">{{tagged_users}}</div>
+                                    </div>
+                                    <div class="recording-duration truncated minimize">{{duration}} seconds</div>
+                                    
+                                    <div class="tile-play truncated minimize" style="width:50px; height:30px; position:relative; z-index:999;" onclick="open_recording(event)">
+                                        <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1500"><defs><style>.cls-2{fill:#37b34a;}</style></defs><title>Kid Talk</title><path class="cls-2" d="M98.53,126.21l32,1248.36S1154.84,1038.4,1388.05,707c0,0,54.49-65-50.69-124.4S98.53,126.21,98.53,126.21Z"/><path d="M49.81,126.21l28,1092.68,4,155.68c.78,30.21,30.71,57.17,61.68,47,155.26-51,308.13-110.57,458.71-174,247.89-104.32,506.72-219.26,713.81-394.36,64.3-54.37,162.11-134.36,126.69-228.45-28.57-75.92-120.92-104-189.57-131.4-211-84.11-425.55-159.58-639.33-236.15q-250.86-89.85-502.32-178c-59.31-20.77-84.8,73.34-25.9,94,337.86,118.3,675.7,237.27,1010.64,363.63,65.15,24.58,134.16,48.31,195,77.18,29,13.77,61,28.35,59.14,62-.27,4.89,6.87-8.53-4.33,6.39-6.11,8.12-12.16,16-18.73,23.78-16.87,19.9-35.53,38.36-54.77,55.94C1088.08,930.62,842,1038.85,615.21,1137c-162.81,70.44-329,135.2-497.63,190.63l61.68,47-28-1092.68-4-155.68C145.65,63.62,48.19,63.38,49.81,126.21Z"/></svg>
+                                        <!-- <div style="font-weight:700;">Play</div> -->
+                                    </div>
+                                </div>
+                                <div class="tile-icon">{{tile_icon}}</div>
+                                <div class="recording-text truncated minimize">{{transcription}}{{description}}</div>
+                                <div class="recording-edit truncated minimize" data-edit_id="{{id}}" onclick="edit_recording(this)">
+                                    <svg fill="#FFFFFF" width="100pt" height="100pt" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="m67.172 3.1719-56 56c-0.32031 0.32031-0.57812 0.70312-0.76172 1.1172-0.050781 0.10938-0.089844 0.21875-0.14062 0.33984s-0.12109 0.25-0.14844 0.39062l-8 32c-0.35156 1.3711 0.050781 2.8242 1.0508 3.8242 1.0039 0.99609 2.457 1.3906 3.8281 1.0352l32-8c0.14062 0 0.26172-0.10938 0.39062-0.14844l0.33984-0.14062c0.41797-0.18359 0.79688-0.44141 1.1211-0.76172l56-56c0.74219-0.75391 1.1562-1.7695 1.1484-2.8281 0-7.4258-2.9492-14.547-8.1992-19.801-5.2539-5.25-12.375-8.1992-19.801-8.1992-1.0625 0-2.0781 0.42188-2.8281 1.1719zm-50.121 63.137c4.1875 0.65234 8.0586 2.6211 11.051 5.625 2.9922 3 4.9492 6.875 5.5898 11.066l-22.191 5.5zm23.668 11.32c-0.96875-3.0508-2.457-5.9141-4.3984-8.457 0.17578-0.10547 0.34766-0.21875 0.50781-0.34375l49.82-49.828c1.8789 2.8008 3.0117 6.0391 3.293 9.3984zm40.281-64.277-49.828 49.82c-0.125 0.16016-0.23828 0.33203-0.34375 0.50781-2.543-1.9414-5.4062-3.4297-8.457-4.3984l49.219-49.223c3.3672 0.27734 6.6055 1.4102 9.4102 3.293z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="recording-comments truncated minimize">
+                                <div class="snippets-section {{show_snippets}}">
+                                    <div class="snippets-header hide-header">SNIPPETS</div>
+                                    <div class="existing-snippets"></div>
+                                </div>
+                                <div class="comments-header">COMMENTS</div>
+                                <div class="existing-comments">{{comments_html}}</div>
+                                <div class="add-comment" onclick="add_comment(event)" data-comment_id="{{id}}">
+                                    + NEW COMMENT
+                                </div>
+                                <div class="add-snippet {{show_snippets}}" onclick="add_snippet(event)" data-snippet_id="{{id}}" data-parent_id="{{parent_id}}">
+                                    &#9986; CREATE SNIPPET
+                                </div>
+                            </div>
+                            <audio id="{{id}}-playback" src="{{audio_file}}" preload="none" class="tile-playback"></audio>
+                        </div>
+                    </div>
+                </template>
+                <img id="scrabook-loader-display" src="/images/loader.gif">
+                <div id="timeline-recordings"></div>
+                <div id="load-more-recordings" style="display:none;" onclick="load_more_recordings(event)">Load More</div>
+                <div id="no-results" style="display:none;">No Results Found</div>
+            </div>
+
+            <!-- Edit Recording Modal -->
+            <template id="edit_recording_modal">
+                <div>
+                    <form name="edit_recording_form" onsubmit="update_edited_recording(event)">
+                        <h2 class="edit-recording-tags-title">Icons</h2>
+                        <div class="edit-recording-icons">
+                        <input type="text" name="modal_icon_search" placeholder="Search icons..." onkeyup="if (event.keyCode==13){ $(this).blur(); } else {show_icons_from_string(this.value)}" onfocus="add_selected_icons(event)">
+                            <div class="current-icon-selections">{{current_icon_selection}}</div>
+                            <div id="view-icons-for-editing"></div>
+                        </div>
+                        <h2 class="edit-transcription">Edit Label</h2>
+                        <input type="text" name="clip_id" value={{id}} style="display:none;">
+                        <input type="text" name="edited_transcription" value={{transcription}} onkeyup="if (event.keyCode==13){ $(this).blur(); }">
+                        <div class="recording-more-edit-options">
+                            <h2 class="edit-recording-tags-title">Tag Users</h2>
+                            <div class="edit-recording-tags">
+                                <div>{{tagged_kid_options}}</div>
+                                <div>{{tagged_adult_options}}</div>
+                            </div>
+                            <h2 class="edit-recording-tags-title">Date</h2>
+                            <div class="edit-recording-date">
+                                <input type="date" name="edit_recording_date" value="{{recording_date}}" onkeyup="if (event.keyCode==13){ $(this).blur(); }">
+                            </div>
+                        </div>
+                        <div onclick="expand_edit_options(event)" class="recording-more-edit-options-button">More Options</div> 
+                        <input type="submit" for="edit_recording_form">
+                        <div class="delete-clip" data-clip_id={{id}} onclick="delete_recording_from_modal(event)">X Delete This Clip</div>
+                    </form>
+                </div>
+            </template>
+
+            <!-- Add Comment Modal -->
+            <template id="add_comment_modal">
+                <div>
+                    <form name="add_comment_form" onsubmit="submit_comment(event)">
+                        <h2 class="edit-transcription">Add Comment</h2>
+                        <input type="text" name="clip_id" value={{id}} style="display:none;">
+                        <input type="text" name="comment_text" onkeyup="if (event.keyCode==13){ $(this).blur(); }">
+                        <input type="submit" for="add_comment_form">
+                    </form>
+                </div>
+            </template>
+
+            <!-- Comment Template -->
+            <template id="view_comment_template">
+                <div>
+                    <div class="recording-comment">
+                        <span class="comment-user-icon" style="display:inline-block;">
+                            <div class="recording-icon" style="background-image:url('/images/SVG/Avatars/parent/{{parent_avatar}}.svg'), url('/images/SVG/Avatars/missing_avatar.svg');"></div>
+                            <div class="commenter-name">{{commenter_name}}</div>
+                        </span>
+                        <span class="comment-content">{{comment_text}}</span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Editing Recording Tags Templates -->
+            <template id="tag-kid-template-scrapbook">
+              <div class="tagged-kid">
+                <label class="custom-checkbox-container">
+                  <div class="recording-icon" style="background-image:url('/images/SVG/Avatars/kid/{{kid_avatar}}.svg'), url('/images/SVG/Avatars/missing_avatar.svg');"></div>
+                  <input type="checkbox" name="kid_tag_{{id}}" value="{{id}}" {{is_checked}}/>
+                  <span class="custom-checkmark"></span>
+                  <label for="kid_tag_{{id}}">{{first_name}}</label>
+                </label>
+              </div>
+            </template>
+            <template id="tag-adult-template-scrapbook">
+              <div class="tagged-adult">
+                <label class="custom-checkbox-container">
+                  <div class="recording-icon" style="background-image:url('/images/SVG/Avatars/parent/{{parent_avatar}}.svg'), url('/images/SVG/Avatars/missing_avatar.svg');"></div>
+                  <input type="checkbox" name="adult_tag_{{id}}" value="{{id}}" {{is_checked}}/>
+                  <span class="custom-checkmark"></span>
+                  <label for="adult_tag_{{id}}">{{first_name}}</label>
+                </label>
+              </div>
+            </template>
+
+            <!-- View Snippet Template -->
+            <template id="scrapbook-snippet-template">
+                <div>
+                    <div class="view-snippet-container">
+                        <audio id="{{id}}-snippet-playback" src="{{audio_file}}" preload="none" class="tile-playback"></audio>
+                        <div class="snippet-el">
+                            <div class="tile-play truncated" style="width:30px; height:30px; position:relative; z-index:999;" onclick="open_snippet(event)">
+                                <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1500"><defs><style>.cls-2{fill:#37b34a;}</style></defs><title>Kid Talk</title><path class="cls-2" d="M98.53,126.21l32,1248.36S1154.84,1038.4,1388.05,707c0,0,54.49-65-50.69-124.4S98.53,126.21,98.53,126.21Z"></path><path d="M49.81,126.21l28,1092.68,4,155.68c.78,30.21,30.71,57.17,61.68,47,155.26-51,308.13-110.57,458.71-174,247.89-104.32,506.72-219.26,713.81-394.36,64.3-54.37,162.11-134.36,126.69-228.45-28.57-75.92-120.92-104-189.57-131.4-211-84.11-425.55-159.58-639.33-236.15q-250.86-89.85-502.32-178c-59.31-20.77-84.8,73.34-25.9,94,337.86,118.3,675.7,237.27,1010.64,363.63,65.15,24.58,134.16,48.31,195,77.18,29,13.77,61,28.35,59.14,62-.27,4.89,6.87-8.53-4.33,6.39-6.11,8.12-12.16,16-18.73,23.78-16.87,19.9-35.53,38.36-54.77,55.94C1088.08,930.62,842,1038.85,615.21,1137c-162.81,70.44-329,135.2-497.63,190.63l61.68,47-28-1092.68-4-155.68C145.65,63.62,48.19,63.38,49.81,126.21Z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="snippet-el">{{formatted_start}}</div>
+                        <div class="snippet-el"><div class="fas fa-{{main_icon}}"></div></div>
+                        <div class="snippet-el">{{transcription}}</div>
+                        <div class="snippet-el">
+                            <div class="snippet-edit" onclick="edit_recording(this)" data-edit_id="{{id}}">
+                                <svg fill="#000" width="30px" height="30px" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m67.172 3.1719-56 56c-0.32031 0.32031-0.57812 0.70312-0.76172 1.1172-0.050781 0.10938-0.089844 0.21875-0.14062 0.33984s-0.12109 0.25-0.14844 0.39062l-8 32c-0.35156 1.3711 0.050781 2.8242 1.0508 3.8242 1.0039 0.99609 2.457 1.3906 3.8281 1.0352l32-8c0.14062 0 0.26172-0.10938 0.39062-0.14844l0.33984-0.14062c0.41797-0.18359 0.79688-0.44141 1.1211-0.76172l56-56c0.74219-0.75391 1.1562-1.7695 1.1484-2.8281 0-7.4258-2.9492-14.547-8.1992-19.801-5.2539-5.25-12.375-8.1992-19.801-8.1992-1.0625 0-2.0781 0.42188-2.8281 1.1719zm-50.121 63.137c4.1875 0.65234 8.0586 2.6211 11.051 5.625 2.9922 3 4.9492 6.875 5.5898 11.066l-22.191 5.5zm23.668 11.32c-0.96875-3.0508-2.457-5.9141-4.3984-8.457 0.17578-0.10547 0.34766-0.21875 0.50781-0.34375l49.82-49.828c1.8789 2.8008 3.0117 6.0391 3.293 9.3984zm40.281-64.277-49.828 49.82c-0.125 0.16016-0.23828 0.33203-0.34375 0.50781-2.543-1.9414-5.4062-3.4297-8.457-4.3984l49.219-49.223c3.3672 0.27734 6.6055 1.4102 9.4102 3.293z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+    
+    <style>
+
+        .recording-date-info,
+        .tagged-user-info,
+        .recording-duration,
+        .recording-edit,
+        .recording-date,
+        .recording-day-time,
+        .recording-child-age,
+        .tagged-users-section,
+         {
+            display:inline-block;
+            vertical-align:middle;
+        }
+
+        .recording-file-time {
+            display:inline-block;
+        }
+
+        .recording-file-time[filetime=""] {
+            display:none;
+        }
+
+        .header {
+            /*background-color:#fff;*/
+            /*color:#FF7648;*/
+        }
+
+        div.delete-clip {
+            font-size:1.2rem;
+            font-weight:700;
+            padding:1.6rem 2.0rem;
+        }
+        h2.edit-transcription {
+            font-size:1.8rem;
+            font-weight:700;
+            margin-bottom:2.0rem;
+        }
+        input[name="search_recordings"] {
+            background:#dedede;
+            border:none;
+            outline:none;
+            border-radius:0.6rem;
+            border-top-right-radius:0;
+            border-bottom-right-radius:0;
+            font-size:1.2rem;
+            font-weight:500;
+            margin-bottom:20px;
+            padding:10px;
+            padding-left:2.4rem;
+            width:60%;
+        }
+
+        input[name="search_recordings"]::placeholder {
+            position:relative;
+            color:#222;
+        }
+
+        #search-recordings {
+            position:relative;
+            right:1.2rem;
+            white-space:nowrap;
+        }
+
+        #search-recordings::before { 
+            content: "\002315"; 
+            max-width:0;
+            overflow:visible;
+            font-size:2.4rem; 
+            position:relative; 
+            left:2.4rem;
+            top:0.4rem;
+        }
+
+        #load-more-recordings {
+            background: #FF7648;
+            border:2px solid #FF7648;
+            border-radius:1.0rem;
+            color:white;
+            cursor:pointer;
+            font-size:1.6rem;
+            font-weight:700;
+            padding:1.6rem 2.0rem;
+            margin:0 auto;
+            margin-top:2.0rem;
+            text-align:center;
+            width:75%;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ and Edge */
+            user-select: none; /* Standard syntax */
+        }
+
+        #load-more-recordings:first-child {
+            display:none;
+        }
+
+        #load-more-recordings.pressed {
+            background:white;
+            border-color:black;
+            color:black;
+        }
+
+        #no-results {
+            color:#888;
+            font-size:1.5rem;
+            margin-top:3.0rem;
+            text-align:center; 
+        }
+
+        #timeline-recordings {
+            box-sizing:border-box;
+            /*padding-left:10px;
+            padding-right:10px;*/
+            text-align:left;
+            margin-top:1.0rem;
+        }
+
+        .recording-container {
+            background:#FF7648;
+            border-radius:0.6rem;
+            color:white;
+            display:inline-block;
+            cursor:pointer;
+            height:auto;
+            margin:0 1.3vw 10px 1.3vw;
+            /*max-width:400px;*/
+            box-sizing:border-box;
+            vertical-align:top;
+            padding:10px 20px 10px 20px;
+            position:relative;
+            transition:0.1s;
+            width:100%;
+        }
+
+        .recording-container.conversation {
+            background:#6E7FC8;
+        }
+
+        .recording-container.picture {
+            background:darkblue;
+        }
+
+        .recording-container[processed='false'] {
+            opacity:.2;
+        }
+
+            .recording-container audio {
+                display:none;
+            }
+
+        .recording-duration {
+            text-align:left;
+            display:none;
+        }
+        .recording-child-age {
+            display:block;
+            font-size:1.2rem;
+            font-weight:700;
+            line-height:1.4rem;
+            margin-bottom:0.4rem;
+            text-align:right;
+            vertical-align:top;
+        }
+
+        .recording-date-info, .tagged-users-section {
+            display:inline-block;
+        }
+
+        .tagged-users-section {
+            overflow:hidden;
+            overflow-x:hidden;
+            float:right;
+            white-space:nowrap;
+        }
+
+        .recording-container.minimize .tagged-users-section {
+            max-width:calc(100% + 10px);
+        }
+
+        .recording-date-info {
+            text-align:left;
+            vertical-align:top;
+            width:calc(100% - 6.6rem);
+        }
+
+        .recording-date {
+            font-size:1.0rem;
+            font-weight:500;
+            line-height:1.4rem
+        }
+
+        .recording-icon {
+            background:#ffffff;
+            border-radius:50%;
+            display:inline-block;
+            color:black;
+            font-family:proxima-soft, sans-serif;
+            font-size:1.0rem;
+            font-weight:500;
+            height:1.8rem;
+            line-height:1.8rem;
+            margin-bottom:0.2rem;
+            margin-left:5px;
+            overflow:hidden;
+            text-align:center;
+            width:1.8rem;
+            direction:rtl;
+            vertical-align:middle;
+        }
+
+        .recording-text {
+            font-size:1.6rem;
+            font-weight:700;
+            margin:0.2rem auto 0.8rem auto;
+            box-sizing:border-box;
+            max-width:60%;
+            position:relative;
+            bottom:0.2rem;
+            text-align:center;
+            word-wrap:break-word;
+            /*white-space:nowrap;*/
+        }
+
+        .recording-text::before,
+        .recording-text::after {
+            font-size:32px;
+        }
+        
+        .recording-text::before {
+            /*content:'\201C\00A0';*/ /* Left Quote  */
+        }
+        
+        .recording-text::after {
+            /*content:'\00A0\201D';*/ /* Right Quote */
+        }
+
+        .scrapbook-button {
+            background:#FF7648; 
+            border:none;
+            border-radius:5px;
+            color:white;
+            cursor:pointer;
+            font-size:18px;
+            margin:20px auto 0 auto;
+            padding:15px;
+            outline:none;
+        }
+
+        .scrapbook-checkbox-container {
+            display:block;
+            margin-top: 20px;
+        }
+
+        .search-button {
+            display:inline-block;
+            background:#FF7648;
+            color:white;
+            font-size:1.2rem;
+            font-weight:bold;
+            outline:none;
+            border:none;
+            border-radius:0.6rem;
+            border-top-left-radius:0;
+            border-bottom-left-radius:0;
+            padding:0.6rem;
+            position:relative;
+            right:0.3rem;
+            width:auto;
+            margin-bottom:10px;
+            padding-left:1.0rem;
+            padding-right:1.0rem;
+        }
+
+        .search-options {
+            padding-top: 2px;
+            height:0;
+            overflow:visible;
+            position:relative;
+            bottom:1.4rem;
+            margin-bottom:1.0rem;
+        }
+
+        .scrapbook-container {
+            margin:0 auto 20px auto;
+            max-width:960px;
+        }
+
+        .scrapbook-title {
+            color:black;
+            font-size:18px;
+            margin:40px auto 20px auto;
+        }
+
+        #search-filters {
+            text-align:left;
+            width:100%;
+            padding-left:2.0vw;
+        }
+        #search-filters label {
+            color:#FF7648;
+            font-size:16px;
+            font-weight:600;
+            text-align:left;
+        }
+        #search-filters select {
+            background:#eee;
+            border:none;
+            border-radius:0.4rem;
+            display:inline-block;
+            color:#FF7648;
+            font-size:16px;
+            margin-left:5px;
+            outline:none;
+            padding:10px;
+            width:75%;
+        }
+        .search-recordings {
+            margin:20px;
+        }
+        .tagged-user-info {
+            display:inline-block;
+            veritcal-align:middle;
+            width:6.0rem;
+        }
+
+        .recording-container.minimize .tagged-user-info {
+            width:100%;
+        }
+
+        .time-period-text {
+            color:#FF7648;
+            width:60vw;
+            font-size:1.6rem;
+            font-weight:700;
+            margin:20px 0 10px 1.3vw;
+        }
+
+
+        @media only screen and (min-width: 960px) {
+            .scrapbook-container #search-recordings, 
+            .scrapbook-container .show-options, 
+            .scrapbook-container #search-filters,
+            .scrapbook-container #toggle-display-options{
+                max-width: calc(960px - 5%);
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+            .scrapbook-container .show-options {
+                max-width: calc(960px - 7%);
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+            .scrapbook-container #toggle-display-options,
+            .scrapbook-container #clear-search {
+                margin-right:1.0rem;
+            }
+
+            .recording-container {
+                margin:0 1.3vw 1.3vw 1.3vw;
+            }
+        }
+
+        .recording-container[playing="true"] {
+            opacity:.8;
+        }
+
+        .recording-container[playing="true"]:before {
+            content:'';
+            background:();
+        }
+
+        .recording-container.minimize {
+            width:100%;
+            height:7.0rem;
+            padding:10px;
+            transition:0.1s;
+        }
+
+        .recording-container.hide-for-date-header {
+            opacity:0;
+            width:0;
+            max-width:0;
+            overflow:hidden;
+        }
+
+        .recording-container.minimize.conversation {
+            width:100%;
+            padding: 0;
+        }
+
+        .recording-container.minimize > .mini-bg > .header {
+            padding-right:0;
+            padding-top:0;
+        }
+
+        .recording-container.minimize.conversation > .mini-bg > .header {
+            padding-right:10px;
+            padding-top:10px;
+        }
+
+        .recording-container .truncated.minimize {
+            display:none;
+        }
+
+        .recording-edit {
+            bottom:0.8rem;
+            color:rgba(255,255,255,0.6);
+            display:inline-block;
+            font-size:1.4rem;
+            float:right;
+            height:1.8rem;
+            line-height:1.8rem;
+            position:relative;
+            text-align:center;
+            vertical-align:top;
+            /*top:4.5rem;*/
+            bottom:2.5rem;
+            width:1.8rem;
+            z-index:3;
+            background-color:transparent;
+        }
+
+        .recording-edit svg {
+            height:auto;
+            width:100%;
+        }
+
+        .show-options {
+            font-weight:700;
+            margin:1.0rem auto 0 0.5rem;
+            /*text-align:center;*/
+            white-space:nowrap;
+        }
+
+        .show-option {
+            border-radius:4px;
+            color:white;
+            cursor:pointer;
+            margin:0 1px;
+            padding:6px 12px;
+        }
+
+        .show-option.show-clip {
+            background:#FF7648;
+            /*margin-left:6px;*/
+        }
+
+        .show-option.show-conversations {
+            background:#6E7FC8;
+        }
+
+        .show-option.show-picture {
+            background:darkblue;
+        }
+
+        .tile-icon {
+            font-size:4.0rem;
+            position: relative;
+            width:100%;
+            text-align:center;
+            bottom:1.0rem;
+            height:auto;
+        }
+
+        .recording-container.minimize .tile-icon {
+            bottom:0;
+            font-size:2.4rem;
+            position: absolute;
+            display:block;
+            width:100%;
+            text-align:left;
+            height:2.28rem;
+            overflow-y: hidden;
+            vertical-align:bottom;
+            bottom:1.0rem;
+        }
+
+        #remember-when-buttons {
+            bottom:1.0rem;
+            position:relative;
+            width: 95%;
+            text-align:right;
+        }
+
+        #remember-when-buttons div {
+            color:darkblue;
+            font-size:2.0rem;
+            margin-left:0.4rem;
+            text-align:right;
+        }
+
+        .alert-bubble {
+            width:1.5rem;
+            height:1.5rem;
+            border-radius:50%;
+            background:red;
+            color:white;
+            text-align:center;
+            font-weight:700;
+            line-height:1.5rem;
+            font-size:1.2rem;
+            position:absolute;
+            top:-0.75rem;
+            right:-0.75rem;
+        }
+
+        .recording-comments {
+            font-weight:700;
+            width:100%;
+            margin:0 auto 0.5rem auto;
+        }
+
+        .recording-comment {
+            display:block;
+            margin:0.6rem 0 0 0;
+        }
+
+        .recording-comment .comment-user-icon {
+            vertical-align:top;
+        }
+
+        .comment-content {
+            margin-left: 1.0rem;
+            /*margin-top:0.2rem;*/
+            background:#ddd;
+            border-radius:1.0rem;
+            color:black;
+            display:inline-block;
+            padding:0.3rem 1.0rem;
+            max-width:60%;
+        }
+
+        .add-comment, .add-snippet {
+            border:2px solid white;
+            border-radius:0.5rem;
+            display:inline-block;
+            padding:0.8rem 1.0rem;
+            width:35%;
+            text-align:center;
+            margin:1.0rem 0 0.4rem 0;
+        }
+
+        .add-comment {
+            background:transparent;
+        }
+
+        .add-snippet {
+            background:#FF7648;
+            color:white;
+            display:none;
+            float:right;
+        }
+
+        .add-snippet.show-snippets {
+            display:block;
+        }
+
+        .comments-header, .snippets-header {
+            margin-bottom:0.6rem;
+            margin-top:2.0rem;
+        }
+
+        .snippets-header.hide-header {
+            margin-top:0;
+            display:none;
+        }
+
+        .no-comments-text {
+            margin:0.6rem auto;
+            font-weight:500;
+            font-style:italic;
+        }
+
+        .timeline-element-container.minimize {
+            display:inline-block;
+            transition-duration: 0s;
+            width:calc(30% + (1% / 3));
+            margin:0 1%;
+        }
+
+        .timeline-element-container {
+            display:inline-block;
+            /*transition:0.2s;*/
+            width:95%;
+            margin:0 1%;
+        }
+
+        .timeline-element-container.squeezed-for-header,
+        .timeline-element-container.minimize.squeezed-for-header,
+        .timeline-element-container.minimize.conversation.squeezed-for-header {
+            margin:auto 0;
+            width:0%;
+        }
+
+        .timeline-element-container.minimize.conversation {
+            display:inline-block;
+            transition-duration: 0s;
+            width:calc(30% + (1% / 3));
+            margin:0 1%;
+        }
+
+        .timeline-element-container.conversation {
+            display:inline-block;
+            /*transition:0.2s;*/
+            width:95%;
+            margin:0 1%;
+        }
+
+        .recording-container .icon-t {
+            color:rgba(255, 255, 255, 0.85);
+            margin-left:20px;
+        }
+
+        .recording-container.minimize .icon-t {
+            margin-left:0;
+        }
+
+        .recording-container.minimize .tile-icon .icon-t:first-child {
+            margin-right:10px;
+        }
+
+        .commenter-name {
+            color:rgba(255, 255, 255, 0.8);
+            max-width:0;
+            overflow:visible;
+            margin-left:0.2rem;
+        }
+
+        .edit-recording-tags-title {
+            /*margin-top:2.0rem;*/
+            /*margin-bottom:1.0rem;*/
+            padding-bottom:0;
+            font-size:1.8rem;
+            font-weight:700;
+        }
+
+        .modal-content form .edit-recording-tags label {
+            color:black;
+            display:inline-block;
+            font-size:1.2rem;
+        }
+
+        .modal-content form .edit-recording-tags input {
+            color:black;
+            display:inline-block;
+            font-size:1.2rem;
+        }
+
+        .modal-content form .edit-recording-tags .custom-checkbox-container {
+            margin:0;
+            padding:0;
+        }
+
+        .modal-content form .edit-recording-tags .custom-checkmark {
+            top:0.95rem;
+        }
+
+        .modal-content form .edit-recording-tags .tagged-kid,
+        .modal-content form .edit-recording-tags .tagged-adult {
+            margin-top:0;
+            padding-top:0;
+        }
+
+        .modal-content form .edit-recording-tags .recording-icon {
+            margin-left:2.4rem;
+        }
+
+        .modal-content form .recording-more-edit-options {
+            max-height:0;
+            overflow:hidden;
+            transition-duration:0.2s;
+        }
+
+        .modal-content form .recording-more-edit-options.expanded {
+            max-height:800px;
+            transition:0.2s; 
+        }
+
+        .modal-content form .recording-more-edit-options-button {
+            background:#6E7FC8;
+            border-radius:2.0rem;
+            font-weight:700;
+            font-size:1.2rem;
+            text-align:center;
+            color:white;
+            margin-top:2.0rem;
+            padding:0.9rem;
+        }
+
+        .modal-content form[name="edit_recording_form"] input[type="submit"] {
+            font-weight:700;
+            font-size:1.2rem;
+            margin-top:0.8rem;
+            margin-bottom:0rem;
+            padding:0.8rem;
+        }
+
+        .modal-content form[name="edit_recording_form"] .edit-recording-date input {
+            width:96%;
+            box-sizing:border-box;
+        }
+
+        .modal-content form[name="edit_recording_form"] input[name="modal_icon_search"] {
+            width:96%;
+            box-sizing:border-box;
+        }
+
+        .modal-content form[name="edit_recording_form"] input[name="edit_recording_date"] {
+            background:white;
+        }
+
+        .modal-content form[name="edit_recording_form"] .current-icon-selections {
+            margin-top:1.0rem;
+        }
+
+        .modal-content form[name="edit_recording_form"] .edit-recording-icons,
+        .modal-content form[name="edit_recording_form"] .edit-recording-tags,
+        .modal-content form[name="edit_recording_form"] .edit-recording-data {
+            margin-bottom:0.7rem;
+        }
+
+        .modal-content form[name="edit_recording_form"] .edit-recording-icons {
+            margin-bottom:1.4rem;
+        }
+
+        .modal-content form[name="edit_recording_form"] .edit-transcription {
+            margin-bottom:0;
+        }
+
+        .modal-content form[name="edit_recording_form"] .recording-more-edit-options.expanded {
+            margin-top:1.4rem;
+        }
+
+        .show-option.selected-option {
+            background:white;
+            border:2px solid black;
+            color:black;
+        }
+
+        #search-filter-options {
+            max-height:0;
+            overflow:hidden;
+            transition:0.1s;
+        }
+
+        #search-filter-options.expand-options {
+            max-height:300px;
+        }
+
+        #toggle-display-options, #clear-search {
+            color:#FF7648;
+            cursor:pointer;
+            font-size:1.2rem;
+            font-weight:700;
+            text-align:right;
+            margin-right:0;
+            /*text-decoration:underline;*/
+            position:relative;
+            bottom:1.0rem;
+        }
+
+        #clear-search > span {
+            vertical-align: middle;
+        }
+
+        #clear-search > span:first-child {
+            font-size: 12px;
+        }
+
+        #clear-search {
+            margin-top:0.4rem;
+        }
+
+        .scrapbook-container #toggle-display-options,
+        .scrapbook-container #clear-search {
+            margin-right:1.0rem;
+        }
+
+        .minimize > .mini-bg > .header {
+            height: 34px;
+            padding-right: 10px;
+            padding-top: 10px;
+        }
+
+        .minimize > .mini-bg > .tile-icon {
+            padding-left: 10px;
+            height: 40px;
+        }
+
+        .minimize > .mini-bg {
+            height: 100%;
+            border-radius: 0.8em;
+            padding: 0;
+            margin-top: 0;
+        }
+
+        .mini-bg {
+            border-radius: 0.8em;
+            padding: 5px 5px 5px 5px;
+            margin-top: 10px;
+        }
+
+        .snippets-section {
+            display:none;
+        }
+
+        .snippets-section.show-snippets {
+            display:block;
+        }
+
+        .view-snippet-container {
+            background:rgba(255,255,255,0.85);
+            border-radius:0.6rem;
+            color:black;
+            margin-top:0.6rem;
+            padding:0.5rem;
+            vertical-align:middle;
+            width:calc(100% - 1.0rem);
+            display:table;
+        }
+
+        .view-snippet-container .snippet-el {
+            /*display:inline-block;*/
+            margin:0 0.4rem;
+            vertical-align:middle;
+            display:table-cell;
+            table-layout: fixed;
+            width:20%;
+            text-align:center;
+        }
+
+        .view-snippet-container .snippet-el:last-child {
+            text-align: right;
+        }
+
+        #scrabook-loader-display {
+            width:150px;
+            height:150px;
+            position:relative;
+            right:75px;
+            margin:5vh 50% 100vh 50%;
+        }
+
+        #search-filters select#filter_scrapbook {
+            box-shadow:none;
+        }
+
+        .recording-container .tile-icon .show-only-words {
+            font-size:1.2rem; 
+            font-weight:bold; 
+            white-space:pre-wrap; 
+            width:80%; 
+            overflow-y:hidden;
+        }
+    </style>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+
+        /* Scrapbook Global Variables */
+        var recording_subscription = null;
+
+        var tagged_child_objects = {};
+        var tagged_adult_objects = {};
+
+        var scrapbook_data = {
+            accessible_kid_ids: [],
+            current_recordings: [],
+            first_batch: [],
+            next_recordings: [],
+            last_recording: undefined,
+            standard_limit: 20,
+            upper_limit: 200, /* Upper Search Limit */
+            query_limit: 20, /* Pagination Limit */
+            initialized: false,
+            show_only: "",
+        }
+
+        /* SCRAPBOOK CORE */
+
+        /* Load Scrapbook */
+        function load_scrapbook (user_id, user_email) {
+            var user_id = user_id;
+            initialze_options_and_populate(user_id, user_email)
+            initialize_tagged_adult_options(user_id)
+            initialize_shared_children_options(user_email)
+        }
+
+        function reset_scrapbook () {
+            console.log("reset_scrapbook")
+            scrapbook_data = {
+                accessible_kid_ids: [],
+                current_recordings: [],
+                first_batch: [],
+                next_recordings: [],
+                last_recording: undefined,
+                standard_limit: 20,
+                upper_limit: 200, /* Upper Search Limit */
+                query_limit: 20, /* Pagination Limit */
+                initialized: false,
+                show_only: "",
+            }
+        }
+
+        /* Unload Scrapbook */
+        function unload_scrapbook () {
+            data.unsubscribe(recording_subscription)
+            doc.query("#search-filters select").value = "all_recordings"
+            doc.get_id('search_recordings_text').value = ""
+            doc.get_id('only_no_transcription').checked = false
+            doc.get_id("timeline-recordings").innerHTML = ""
+            window.player.pause()
+        }
+
+        /* Set Filter Options Based on Family */
+        function set_family_filter_options (kids=[], adults=[]) {
+            var tagged_child_container = doc.get_id("tagged_children_options");
+            for (var i=0; i<kids.length; i++) {
+                add_child_to_filter_options(kids[i], 
+                    tagged_child_container);
+            }
+            var tagged_adult_container = doc.get_id("tagged_adults_options");
+            for (var i=0; i<adults.length; i++) {
+                add_tagged_adult_to_filter_options(adults[i], 
+                    tagged_adult_container);
+            }
+        }
+
+        /* Add Child Family Member to Filter Options */
+        function add_child_to_filter_options (child_obj, option_container) {
+            if (!doc.get_id("child_recordings_" + String(child_obj.id))) {
+                option_container.innerHTML += "<option id='child_recordings_" + 
+                    String(child_obj.id) + "' class='child-option' value='" + 
+                    "child_recordings_" + String(child_obj.id) + 
+                    "'>" + String(child_obj.first_name) + "'s Recordings</option>";
+            }
+        }
+
+        /* Add Tagged Adult to Filter Options */
+        function add_tagged_adult_to_filter_options (tagged_adult_obj, option_container) {
+            if (!doc.get_id("tagged_adult_recordings_" + String(tagged_adult_obj.id))) {
+                option_container.innerHTML += "<option id='tagged_adult_recordings_" + 
+                    String(tagged_adult_obj.id) + "' class='tagged-adult-option' value='" + 
+                    "tagged_adult_recordings_" + String(tagged_adult_obj.id) + 
+                    "'>" + String(tagged_adult_obj.first_name) + "'s Recordings</option>";
+            }
+        }
+
+        /* Initialize My Kids and Populate Timeline */
+        function initialze_options_and_populate (user_id, user_email) {
+            var collection_ref = window.db.collection("Kid")
+            collection_ref = collection_ref.where("original_creator", "==", user_id)
+            collection_ref.get().then(function(kids) {
+                var all_data = [];
+                kids.docs.forEach(function(kid) {
+                    var _data = kid.data();
+                    _data.id = kid.id;
+                    all_data.push(_data)})
+                var kids = all_data;
+                kids.forEach(function(tagged_child) {
+                    tagged_child_objects[tagged_child.id] = tagged_child; 
+                })
+                run_initial_queries_and_populate(user_id, user_email, kids)
+            })
+        }
+
+        /* Initialize My Tagged Adults */
+        function initialize_tagged_adult_options (user_id) {
+            var collection_ref = window.db.collection("TaggedAdult")
+            collection_ref = collection_ref.where("original_creator", "==", user_id)
+            collection_ref.get().then(function(tagged_adults) {
+                var all_data = [];
+                tagged_adults.docs.forEach(function(tagged_adult) {
+                    var _data = tagged_adult.data();
+                    _data.id = tagged_adult.id;
+                    all_data.push(_data)})
+                var tagged_adults = all_data;
+
+                tagged_adults.forEach(function(tagged_adult) {
+                    tagged_adult_objects[tagged_adult.id] = tagged_adult; 
+                })
+
+                tagged_adult_objects[window.user_id] = {
+                    first_name: "Me",
+                    parent_avatar: window.user_avatar || window.user.parent_avatar
+                }
+
+                /* Set Tagged Adult Filters Here */
+                set_family_filter_options([], tagged_adults);
+            })
+        }
+
+        /* Initialize Shared Kids */
+        function initialize_shared_children_options (user_email) {
+            var collection_ref = window.db.collection("Invitation")
+            collection_ref = collection_ref.where("email", "==", user_email)
+            collection_ref.get().then(function(invitations) {
+                var all_data = [];
+                invitations.docs.forEach(function(invitation) {
+                    var _data = invitation.data();
+                    _data.id = invitation.id;
+                    all_data.push(_data)})
+                var invitations = all_data;
+
+                if (invitations.length == 0) {
+                    console.log("No Invitations")
+                } else {
+                    var kid_ids =[];
+                    for (var i=0; i<invitations.length; i++) {
+                        kid_ids.push(invitations[i].kid)
+                    }
+                    data.get_model_ids("Kid", kid_ids).then(function(kids) {
+                        kids.forEach(function(tagged_child) {
+                            tagged_child_objects[tagged_child.id] = tagged_child; 
+                        })
+                        set_family_filter_options(kids);
+                    })
+                }
+            })
+        }
+
+        /* Combine both kid types and load first set of recordings */
+        function combine_accessible_kids_and_populate (user_id, kid_ids) {
+            var collection_ref = window.db.collection("Kid")
+            collection_ref = collection_ref.where("original_creator", "==", user_id)
+            collection_ref.get().then(function(my_kids) {
+                var all_data = [];
+                my_kids.docs.forEach(function(my_kid) {
+                    var _data = my_kid.data();
+                    _data.id = my_kid.id;
+                    all_data.push(_data)})
+                var my_kids = all_data;
+                    
+                /* Combine my kids with any shared kids */
+                my_kids.forEach(function(my_kid) {
+                    kid_ids.push(my_kid.id)
+                })
+                scrapbook_data.accessible_kid_ids = kid_ids;
+                get_initial_recordings();
+            })
+        }
+
+        /* Finish running initial queries for filter setup and populate */
+        function run_initial_queries_and_populate (user_id, user_email, kids) {
+            var collection_ref = window.db.collection("Invitation")
+            collection_ref = collection_ref.where("email", "==", user_email)
+            collection_ref.get().then(function(invitations) {
+                var all_data = [];
+                invitations.docs.forEach(function(invitation) {
+                    var _data = invitation.data();
+                    _data.id = invitation.id;
+                    all_data.push(_data)})
+                var invitations = all_data;
+
+                if (invitations.length == 0) {
+                    var kid_ids = [];
+                } else {
+
+                    /* Get kids shared with me */
+                    var kid_ids = [];
+                    for (var i=0; i<invitations.length; i++) {
+                        kid_ids.push(invitations[i].kid)
+                    }
+                }
+                combine_accessible_kids_and_populate(user_id, kid_ids);
+            })
+            
+            /* Get Family Info and Set Filtering Options */
+            set_family_filter_options(kids);
+        }
+
+        /* Determin Icon Display */
+        function determine_icon_display (recording) {
+            if (recording.transcription != undefined && recording.transcription != "") {
+                recording.tile_icon += "<div class='show-only-words'>" + recording.transcription + "</div>";
+            } else if (recording.description != undefined && recording.description != "") {
+                recording.tile_icon += "<div class='show-only-words'>" + recording.description + "</div>";
+            } else {
+                recording.tile_icon += "<div class='icon-t fas fa-question-circle'></div>";
+            }
+            return recording;
+        }
+
+        /* Clean Recording */
+        function clean_recording (recording) {
+            var recording_date = new Date(recording.time)
+
+            if (recording.description == undefined) {
+                recording.description = ""
+            } else if (recording.transcription == undefined) {
+                recording.transcription = ""
+            }
+
+            if (recording.time_period_class == undefined) {
+                recording.time_period_class = "no-time-period-text"
+                recording.time_period_text = ""
+                recording.date_header_class = ""
+            }
+            
+            // recording.day_and_time = construct_day_time(recording_date);
+            recording.date_of_recording = epoch_toLocaleDateString(recording_date);
+
+            recording.tagged_users = String(get_recording_tags_html(recording))
+            recording.child_age = get_child_age_text(recording)
+            
+            if (!recording.processed || recording.processed == false) {
+                recording.processed = false
+            }
+
+            try {
+                if (recording_date.getTime() > new Date("2020-09-08").getTime() &&
+                    recording_date.getTime() <= new Date("2020-10-30").getTime()) {
+                    recording.processed = true;
+                }
+            } catch (_error) {
+                console.log(_error)
+            }
+
+            /* Icon Selector */
+            if (recording.transcription == recording.description && 
+                recording.transcription != undefined &&
+                recording.transcription != "") {
+                recording.description = recording.transcription;
+                recording.transcription = "";
+            }
+
+            var no_transcription_or_description = 
+                (recording.transcription == undefined || recording.transcription == "") &&
+                (recording.description == undefined || recording.description == "");
+
+            recording.tile_icon = ""
+            if (recording.icons != undefined) {
+                for (var j = recording.icons.length - 1; j >= 0; j--) {
+                    recording.tile_icon += "<div class='icon-t fas fa-" + recording.icons[j] + "'></div>";
+                }
+                try {
+                    if (recording.icons.length == 0) {
+                        if (no_transcription_or_description) {
+                            recording.tile_icon += "<div class='icon-t fas fa-question-circle'></div>";
+                        } else {
+                            determine_icon_display(recording);
+                        }
+                    }
+                } catch {
+                    console.log("Error loading icons")
+                }
+            } else if (no_transcription_or_description) {
+                recording.tile_icon += "<div class='icon-t fas fa-question-circle'></div>";
+            } else {
+                try {
+                    determine_icon_display(recording);
+                } catch (error) {
+                    console.log("Error determining icons");
+                }
+            }
+
+            /* Color Coding and Sizing */
+            recording.tile_type = "" // Standard clip orange
+            if (recording.is_clip != undefined) {
+                if (recording.is_clip == false) {
+                    recording.tile_type = "conversation" // Double width and blue
+                } else if (recording.is_clip == true) {
+                    recording.tile_type = "clips";
+                }
+                if (recording.cimg != undefined) {
+                    recording.tile_type = "picture"
+                }
+                
+            } else {
+                if (recording.cimg != undefined) {
+                    recording.tile_type = "picture"
+                } else {
+                    recording.tile_type = "conversation";
+                }
+            }
+
+            /* Snippets (Loaded Asynchronously) */
+            if (recording.is_clip == false || recording.is_clip == undefined) {
+                recording.show_snippets = "show-snippets"
+            } else {
+                recording.show_snippets = ""
+            }
+
+            /* Comments and Alerts */
+            var number_unseen = 0
+            var comments_html = ""
+            var comment_template = doc.get_id("view_comment_template")
+            if (recording.comments != undefined) {
+                if (recording.comments.constructor === Array) {
+                    recording_comments = recording.comments.sort(function(a, b) {
+                        return b.datetime - a.datetime; })
+                    for (var j = recording_comments.length - 1; j >= 0; j--) {
+                        try {
+                            if (!recording_comments[j].seen_by.includes(window.user_id)) {
+                                number_unseen += 1
+                            }
+                        } catch (error) { 
+                            console.log(error) 
+                        }
+                        if (recording_comments[j].commenter_name == undefined || recording_comments[j].commenter_name == "") {
+                            if (recording_comments[j].user_id == window.user_id) {
+                                recording_comments[j].commenter_name = window.user.first_name
+                            } else {
+                                recording_comments[j].commenter_name = ""
+                            }
+                        }
+                        comments_html += doc.render(comment_template, recording_comments[j]).innerHTML
+                    }
+                } else {
+                    comments_html = "<div class='no-comments-text'>Be the first to comment!</div>"
+                }
+            } else {
+                comments_html = "<div class='no-comments-text'>Be the first to comment!</div>"
+            }
+            recording.comments_html = comments_html;
+            recording.number_of_alerts = String(number_unseen)
+            if (number_unseen > 0) {
+                recording.alert_display = "block";
+            } else {
+                recording.alert_display = "none";
+            }
+
+            return recording
+        }
+
+        /* Update Tile */
+        function update_tile (recording) {
+            var recording_tile = doc.get_id(recording.id);
+            if (recording_tile != null && recording_tile != undefined) {
+                recording_tile.setAttribute("processed", recording.processed)
+                var selectors_and_content = [
+                    ['div.alert-bubble', recording.number_of_alerts],
+                    ['div.recording-date', recording.date_of_recording],
+                    ['div.recording-child-age', recording.child_age],
+                    ['div.tagged-users-section', recording.tagged_users],
+                    ['div.tile-icon', recording.tile_icon],
+                    ['div.recording-text', String(recording.transcription) + String(recording.description)],
+                    ['div.existing-comments', recording.comments_html],
+                ]
+                selectors_and_content.forEach(function(entry) {
+                    recording_tile.querySelector(entry[0]).innerHTML = entry[1];
+                })
+            }
+        }
+
+        /* Update Timeline */
+        function update_timeline (recordings) {
+            var timeline_container =doc.get_id("timeline-recordings");
+            var timeline_template = doc.get_id("timeline-recording");
+
+            var last_date_header = ""
+            recordings.forEach(function(recording) {
+                recording = clean_recording(recording);
+                update_tile(recording);
+            })
+        }
+
+        /* Refresh Timeline */
+        function refresh_timeline (recordings) {
+            var timeline_container =doc.get_id("timeline-recordings");
+            var timeline_template = doc.get_id("timeline-recording");
+            var last_date_header = ""
+            for (var i=0; i<recordings.length; i++) {
+                recordings[i] = clean_recording(recordings[i]);
+
+                /* Add by Time Period Text */
+                var month_text = new Date(recordings[i].time).toLocaleString('default', { month: 'long' })
+                var year_text = new Date(recordings[i].time).getFullYear()
+                var time_period_text = month_text + " " + year_text;
+                recordings[i].time_period_class = "no-time-period-text"
+                recordings[i].time_period_text = ""
+                recordings[i].date_header_class = ""
+                if (time_period_text != last_date_header) {
+                    recordings[i].time_period_text = time_period_text
+                    recordings[i].time_period_class = "time-period-text"
+                    recordings[i].date_header_class = "has-date-header"
+                    last_date_header = time_period_text
+                }
+
+                /* Render to DOM or Update if Exists */
+                if (doc.get_id(recordings[i].id) == undefined || doc.get_id(recordings[i].id) == null) {
+                    timeline_container.appendChild(doc.render(timeline_template, recordings[i]));
+                } else {
+                    update_tile(recordings[i]);
+                }
+            }
+            if (recordings.length == 0) {
+                show_no_results();
+            } else {
+                hide_no_results();
+                toggle_load_more();
+                [...doc.get_class("has-date-header")].forEach(function(date_header) {
+                    if (date_header.previousSibling != null) {
+                        if (date_header.previousSibling.nodeName != "BR") {
+                            doc.get_id('timeline-recordings').insertBefore(doc.create_el("br", {}), date_header)
+                        }
+                    }
+                })
+            }
+        }
+        
+
+        /* EVENT HANDLING */
+
+        /* Filter Recordings Based on Dropdown Selection */
+        function filter_recordings (event) {
+            doc.get_id('timeline-recordings').innerHTML = "";
+            doc.get_id("load-more-recordings").style.display = 'none'
+            doc.get_id("scrabook-loader-display").style.display = 'block'
+            var current_selection = event.currentTarget.value
+
+            scrapbook_data.current_recordings = [];
+            scrapbook_data.next_recordings = [];
+
+            if (scrapbook_data.first_batch.length > 0) {
+                scrapbook_data.first_batch = [];
+            }
+
+            var search_text = doc.get_id('search_recordings_text').value
+            var no_transcription_only = doc.get_id('only_no_transcription').checked
+            if (search_text.trim().length > 0 || no_transcription_only) {
+                get_filtered_recordings(search_text, scrapbook_data.upper_limit, 'start_at_first');
+            } else {
+                get_initial_recordings()
+            }
+        }
+
+        /* Playback Recording When You Click Recording Tile */
+        function expand_tile (event) {
+            if (event && event.currentTarget !== undefined) {
+                try {
+                    var is_edit_icon = event.target
+                        .parentElement.className.includes("recording-edit") ||
+                        event.target.className.includes("add-comment") ||
+                        event.target.className.includes("add-snippet");
+                } catch {
+                    var is_edit_icon = true;
+                }
+                if (!is_edit_icon) { // or play icon
+
+                    /* Expand or minimize tiles */
+                    var clicked_el = event.currentTarget;
+                    clicked_el.classList.toggle("minimize")
+                    if(clicked_el.classList.contains("minimize")){
+                        clicked_el.querySelector('.tile-icon').style.opacity = "1";
+                        doc.query_all(".tile-playback").forEach(function (t_player) {
+                            if(event.currentTarget.id + "-playback" == t_player.id ) {
+                                t_player.pause()
+                                t_player.closest(".recording-container").removeAttribute("playing")
+                            }
+                        })
+                    } else {
+                        if (clicked_el.querySelector('.icon-t') == null) {
+                            clicked_el.querySelector('.tile-icon').style.opacity = "0";
+                        }
+                    }
+                    clicked_el.parentElement.classList.toggle("minimize")
+                    elements_to_iterate = clicked_el.getElementsByClassName("truncated")
+                    for (var i = 0; i < elements_to_iterate.length; i++) {
+                        elements_to_iterate[i].classList.toggle("minimize")
+                    } 
+
+                    try {
+                        clicked_el.querySelector('.alert-bubble').style.display = "none"
+                    } catch (error) {
+                        console.log(error)
+                    }
+
+                    /* Log That You've Seen Comments and Load Snippets */
+                    var recording_id = event.currentTarget.id;
+                    data.get_model_including_id("Recording", recording_id).then(function(recording) {
+                        if (recording.comments != undefined) {
+                            if (recording.comments.constructor === Array) {
+                                if (recording.comments.length > 0) {
+                                    for (var i = recording.comments.length - 1; i >= 0; i--) {
+                                        if (!recording.comments[i].seen_by.includes(window.user_id)) {
+                                            recording.comments[i].seen_by.push(window.user_id)
+                                        }
+                                    }
+                                    /* Update Seen by */
+                                    data.update_model("Recording", recording_id, recording, true).then(function() {
+                                        console.log("Updated Seen By");
+                                    })
+                                }
+                            }
+                        }
+                        if (recording.is_clip == false || recording.is_clip == undefined) {
+                            var collection_ref = window.db.collection("Recording");
+                            collection_ref = collection_ref.where("parent_id", "==", recording.id);
+                            collection_ref.get().then(function(snippet_recordings) {
+                                var snippet_recordings_data = snippet_recordings.docs
+                                if (snippet_recordings_data.length > 0) {
+                                    clicked_el.querySelector("div.snippets-header").classList.remove('hide-header');
+                                    clicked_el.querySelector("div.existing-snippets").innerHTML = "";
+                                    snippet_recordings.forEach(function(snippet) {
+                                        var view_snippet_template = doc.get_id('scrapbook-snippet-template');
+                                        var data_copy = Object.assign({}, snippet.data())
+                                        data_copy.id = String(snippet.id);
+                                        var timestamp = data_copy.start
+                                        var hours = Math.floor(timestamp / 60 / 60);
+                                        var minutes = Math.floor(timestamp / 60) - (hours * 60);
+                                        var seconds = Math.floor(timestamp % 60);
+                                        var formatted_start = hours.toString().padStart(1, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+                                        data_copy.formatted_start = "Starts<br>" + formatted_start;
+                                        if (data_copy.icons.constructor === Array) {
+                                            if (data_copy.icons.length > 0) {
+                                                data_copy.main_icon = data_copy.icons[0]
+                                            } else {
+                                                data_copy.main_icon = "question-circle"
+                                            }
+                                        } else {
+                                            data_copy.main_icon = "question-circle"
+                                        }
+                                        var view_snippet_html = doc.render(view_snippet_template, data_copy);
+                                        clicked_el.querySelector("div.existing-snippets").appendChild(view_snippet_html)
+                                    })
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        }
+
+
+        function open_recording (event) {
+            var clicked_tile = event.target
+                .parentElement.parentElement.parentElement.parentElement.parentElement
+
+            if (clicked_tile.getAttribute("processed") == "false") {
+                doc.notify_success("Still processing!")
+            } else {
+                // clear other tiles
+                try {
+                    doc.query_all(".tile-playback").forEach(function (t_player) {
+                        t_player.pause()
+                        t_player.closest(".recording-container").removeAttribute("playing")
+                    })
+                } catch (error) {}
+
+                clicked_tile.setAttribute("playing", true)
+                doc.get_id(clicked_tile.id + "-playback")
+                    .addEventListener('ended', function (e) {
+                    clicked_tile.removeAttribute("playing")
+                })
+
+                doc.get_id(clicked_tile.id + "-playback").pause()
+                load_recording_url(clicked_tile.id).then(function(response) {
+                    doc.get_id(clicked_tile.id + "-playback").src = response[0]
+                    doc.get_id(clicked_tile.id + "-playback").play()
+                })
+            }
+        }
+
+
+        function open_snippet (event) {
+            var _snippet_id = event.currentTarget.parentElement.parentElement.querySelector('.tile-playback').id.split('-snippet-playback')[0]
+            // clear other tiles
+            try {
+                doc.query_all(".tile-playback").forEach(function (t_player) {
+                    t_player.pause()
+                    t_player.closest(".recording-container").removeAttribute("playing")
+                })
+            } catch (error) {}
+
+            doc.get_id(_snippet_id + "-snippet-playback").pause()
+            load_recording_url(_snippet_id).then(function(response) {
+                doc.get_id(_snippet_id + "-snippet-playback").src = response[0]
+                doc.get_id(_snippet_id + "-snippet-playback").play()
+            })
+        }
+
+
+
+        /* Edit Recording */
+        function edit_recording (button) {
+            if (button.className.includes("recording-edit") || 
+                button.className.includes("snippet-edit")) {
+                var recording_id = button.getAttribute('data-edit_id');
+                data.get_model_including_id("Recording", recording_id).then(function(recording) {
+                    if (recording.user_id == window.user_id) {
+                        if (recording.is_clip == false) {
+                            recording.transcription = recording.description
+                        }
+                        
+                        var tag_kid_template = doc.get_id("tag-kid-template-scrapbook")
+                        var tag_adult_template = doc.get_id("tag-adult-template-scrapbook")
+
+                        var tag_wrapper = document.createElement("div");
+                        Object.entries(tagged_child_objects).forEach(function(_tagged_child) {
+                            var tagged_child = Object.assign({}, _tagged_child[1])
+                            if (recording.tagged_kids.includes(_tagged_child[0])) {
+                                tagged_child.is_checked = "checked";
+                            } else {
+                                tagged_child.is_checked = "";
+                            }
+                            var edit_recording_tag = doc.render(tag_kid_template, tagged_child)
+                            tag_wrapper.appendChild(edit_recording_tag);
+                        });
+                        
+                        var edit_recording_tags = tag_wrapper.innerHTML;
+                        recording.tagged_kid_options = edit_recording_tags
+
+                        var tag_wrapper = document.createElement("div");
+                        Object.entries(tagged_adult_objects).forEach(function(_tagged_adult) {
+                            var tagged_adult = Object.assign({}, _tagged_adult[1])
+                            if (recording.tagged_adults.includes(_tagged_adult[0])) {
+                                tagged_adult.is_checked = "checked";
+                            } else {
+                                tagged_adult.is_checked = "";
+                            }
+                            if (_tagged_adult[0] != window.user_id) {
+                                var edit_recording_tag = doc.render(tag_adult_template, tagged_adult)
+                            } else {
+                                var edit_recording_tag = doc.render(tag_adult_template, {
+                                    id: window.user_id,
+                                    first_name: "Myself",
+                                    parent_avatar: window.user.parent_avatar,
+                                    is_checked: tagged_adult.is_checked,
+                                })
+                            }
+                            tag_wrapper.appendChild(edit_recording_tag);
+                        });
+                        
+                        var edit_recording_tags = tag_wrapper.innerHTML;
+                        recording.tagged_adult_options = edit_recording_tags
+
+                        recording.current_icon_selection = ""
+                        if (recording.icons != undefined) {
+                            recording.icons.forEach(function(_icon) {
+                                var rendered_icon = render_icon(_icon);
+                                rendered_icon.setAttribute("icon-selected", "true");
+                                recording.current_icon_selection += rendered_icon.outerHTML
+                            })
+                        }
+
+                        try { 
+                            var current_date = new Date(recording.time)
+                            var dd = current_date.getDate();
+                            var mm = current_date.getMonth()+1;
+                            var yyyy = current_date.getFullYear();
+                            if(dd<10){dd='0'+dd} 
+                            if(mm<10){mm='0'+mm} 
+                            current_date = yyyy+'-'+mm+'-'+dd;
+                            recording.recording_date = current_date
+                            window.beforeEdit = recording.recording_date
+                        }
+                        catch (error) { console.log(error) }
+
+                        var modal_template = doc.get_id("edit_recording_modal")
+                        modal_html = doc.render(modal_template, recording).innerHTML
+                        doc.render_modal(modal_html)
+                    } else {
+                        alert("Only the original user who uploaded this clip can edit or delete it")
+                    }
+                })
+            }
+        }
+
+        /* More Editing Options */
+        function expand_edit_options (event) {
+            var more_button = event.currentTarget
+            var edit_options = more_button.parentElement
+                .querySelector('div.recording-more-edit-options');
+            edit_options.classList.toggle('expanded');
+            if (edit_options.classList.contains('expanded')) {
+                more_button.innerHTML = "View Less"
+            } else {
+                more_button.innerHTML = "More Options"
+            }
+        }
+
+        /* Icons Searching */
+        function show_icons_from_string (string) {
+            // Need to show  already selected icons by default
+            if (string.length > 1) {
+                var icons = []
+                string.split(" ").forEach(function(word){
+                    var search_result = simple_search_icons(word)
+                    if (search_result != null) {
+                        icons.push(search_result)
+                    }
+                })
+
+                var view_icons_el = document.createElement("div")
+                if (icons.length > 3) {
+                    icons = icons.slice(0, 3);
+                }
+                var icons_html = ""
+                icons.forEach(function(icon) {
+                    if (icon.length > 3) {
+                        icon = icon.slice(0, 3);
+                    }
+                    icon.forEach(function(icon_el) {
+                        icons_html += icon_el.outerHTML
+                    })
+                })
+                doc.get_id("view-icons-for-editing").innerHTML = icons_html
+            } else {
+                doc.get_id("view-icons-for-editing").innerHTML = ""
+            }
+        }
+
+        /* Add Icons to Current Selection */
+        function add_selected_icons (event) {
+            if (event.target.value.length > 1) {
+                [...doc.get_id("view-icons-for-editing").getElementsByClassName("transcription-icon")].forEach(function(_icon) {
+                    if (_icon.getAttribute("icon-selected") == true ||
+                        _icon.getAttribute("icon-selected") == "true") {
+                        var current_selections = event.target.parentElement.querySelector("div.current-icon-selections");
+                        current_selections.innerHTML += _icon.outerHTML;
+                        _icon.setAttribute("icon-selected", "false");
+                    }
+                })
+            }
+        }
+
+        /* Update Edited Recording */
+        function update_edited_recording (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            var edit_data = doc.serialize(event.target);
+            data.get_model_including_id("Recording", edit_data.clip_id).then(function(recording) {
+                if (recording.is_clip == false) {
+                    recording.description = edit_data.edited_transcription;
+                } else {
+                    recording.transcription = edit_data.edited_transcription;
+                }
+                var adult_tags = [];
+                var kid_tags = [];
+                for (var key in edit_data) {
+                    if (key.includes("adult_tag_")) {
+                        if (edit_data[key] == true) {
+                            adult_tags.push(key.split("adult_tag_")[1])
+                        }
+                    } else if (key.includes("kid_tag_")) {
+                        if (edit_data[key] == true) {
+                            kid_tags.push(key.split("kid_tag_")[1])
+                        }
+                    }
+                }
+                recording.tagged_adults = adult_tags
+                recording.tagged_kids = kid_tags
+                
+                try {
+                    if (edit_data.edit_recording_date != undefined) {
+                        var new_date = new Date(edit_data.edit_recording_date).getTime()
+                        new_date = new_date += new Date(new_date).getTimezoneOffset() * 60000
+                        if (edit_data.edit_recording_date != window.beforeEdit) {
+                            recording.time = new_date;
+                        }
+                    }
+                } catch (error) { console.log(error); }
+
+                /* Icons to Save */
+                var icons_to_save = [];
+                var selected_icons = event.target.parentElement.getElementsByClassName("transcription-icon")
+                for (let selected_icon of selected_icons) {
+                    if (selected_icon.getAttribute("icon-selected") == true ||
+                        selected_icon.getAttribute("icon-selected") == "true") {
+                        icons_to_save.push(selected_icon.getAttribute("icon-name"))
+                    }
+                }
+                if (selected_icons.length > 0) {
+                    recording.icons = icons_to_save;
+                }
+
+                /* Update Model */
+                data.update_model("Recording", edit_data.clip_id, recording, true).then(function() {
+                    doc.close_modal()
+                    try {
+                        var truncated_text = edit_data.edited_transcription;
+                        doc.get_id(edit_data.clip_id).querySelector('div.recording-text')
+                            .innerHTML = truncated_text;  
+                    } catch (error) { console.log(error) }
+                    try {
+                        update_timeline([recording])
+                        if (recording.icons != undefined) {
+                            if (recording.icons.length > 0) {
+                                doc.get_id(recording.id).querySelector('.tile-icon').style.opacity = "1";
+                            } else {
+                                doc.get_id(recording.id).querySelector('.tile-icon').style.opacity = "0";
+                            }
+                        }
+                    } catch (error) { console.log(error) }
+                })
+            })
+        }
+
+        /* Transfer Date Header To Next Tile */
+        function transfer_date_header_to_next_tile (clip_id) {
+            try {
+                var time_period_el = doc.get_id(clip_id).parentElement.querySelector('.time-period-text');
+                if (time_period_el != null && time_period_el != undefined) {
+                    doc.get_id(clip_id).parentNode.nextSibling.querySelector('.no-time-period-text').outerHTML = time_period_el.outerHTML;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        /* Delete Recording */
+        function delete_recording_from_modal (event) {
+            var clip_id = event.target.getAttribute('data-clip_id')
+            if (confirm("Are you sure you want to delete this recording?")) {
+                data.delete_model("Recording", clip_id)
+                doc.close_modal()
+                try {
+                    if (doc.get_id(clip_id) != undefined) {
+                        transfer_date_header_to_next_tile(clip_id);
+                        doc.get_id(clip_id).parentElement.remove();
+                    }
+                } catch (error) { console.log(error) }
+            } 
+        }
+
+        /* Search Recordings by Entered Text */
+        function enter_search (event) {
+            doc.get_id('timeline-recordings').innerHTML = "";
+            doc.get_id("load-more-recordings").style.display = 'none'
+            doc.get_id("scrabook-loader-display").style.display = 'block'
+            var current_typing = doc.get_id('search_recordings_text').value.toLowerCase().trim();
+            var no_transcription_checked = doc.get_id('only_no_transcription').checked
+            if (current_typing.length > 0 || no_transcription_checked) {
+                scrapbook_data.last_recording = undefined
+                get_filtered_recordings(current_typing, scrapbook_data.upper_limit, 'start_at_first');
+            } else {
+                scrapbook_data.current_recordings = []
+                scrapbook_data.next_recordings = []
+                scrapbook_data.last_recording = undefined
+                scrapbook_data.first_batch = []
+                get_initial_recordings()
+            } 
+        }
+
+        /* Load More Recordings With Button */
+        function load_more_recordings (event) {
+            var load_more_button = event.currentTarget
+            load_more_button.classList.toggle('pressed')
+            load_more_button.innerHTML = "Loading..."
+
+            setTimeout(function() {
+                load_more_button.classList.toggle('pressed')
+                load_more_button.innerHTML = "Load More"
+
+                /* Add next set of recordings to current set, sort and display */
+                scrapbook_data.current_recordings = scrapbook_data
+                    .current_recordings.concat(scrapbook_data.next_recordings)
+                scrapbook_data.current_recordings = scrapbook_data
+                    .current_recordings.sort(function(a, b) {
+                    return b.time - a.time;
+                });
+
+                var unique_recordings_ids = [];
+                var unique_recordings = [];
+
+                for (i=0; i<scrapbook_data.current_recordings.length; i++) {
+                    if (!unique_recordings_ids
+                        .includes(scrapbook_data.current_recordings[i].id)) {
+                        unique_recordings.push(scrapbook_data.current_recordings[i])
+                        unique_recordings_ids.push(scrapbook_data.current_recordings[i].id)
+                    }
+                }
+                scrapbook_data.current_recordings = unique_recordings;
+
+                refresh_timeline(scrapbook_data.first_batch.concat(
+                    scrapbook_data.current_recordings))
+                var last_recording = scrapbook_data
+                    .current_recordings[scrapbook_data.current_recordings.length - 1];
+                
+                scrapbook_data.last_recording = last_recording
+                get_filtered_recordings()
+            }, 1000)
+            
+        }
+
+
+        /* Add Comments */
+        function add_comment (event) {
+            var button = event.target;
+            if (button.className.includes("add-comment")) {
+                var recording_id = button.getAttribute('data-comment_id');
+                data.get_model_including_id("Recording", recording_id).then(function(recording) {
+                    var modal_template = doc.get_id("add_comment_modal")
+                    modal_html = doc.render(modal_template, recording).innerHTML
+                    doc.render_modal(modal_html);
+                })
+            }
+        }
+
+        /* Comment */
+        function submit_comment (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            var comment_data = doc.serialize(event.target);
+            data.get_model_including_id("Recording", comment_data.clip_id).then(function(recording) {
+        
+                /* In the case that no avatar or name has been selected */
+                if (window.user.parent_avatar == undefined) {
+                    var comment_parent_avatar = "no_avatar"
+                } else {
+                    var comment_parent_avatar = window.user.parent_avatar
+                }
+                if (window.user.first_name == undefined) {
+                    var comment_first_name = ""
+                } else {
+                    var comment_first_name = window.user.first_name
+                }
+
+                if (recording.comments == undefined) {
+                    recording.comments = [{
+                        user_id:window.user_id,
+                        parent_avatar:comment_parent_avatar,
+                        commenter_name:comment_first_name,
+                        comment_text:comment_data.comment_text,
+                        datetime:(new Date).getTime(),
+                        seen_by: [window.user_id]
+                    }];
+                } else if (recording.comments.constructor === Array) {
+                    recording.comments.push({
+                        user_id:window.user_id,
+                        parent_avatar:comment_parent_avatar,
+                        commenter_name:comment_first_name,
+                        comment_text:comment_data.comment_text,
+                        datetime:(new Date).getTime(),
+                        seen_by: [window.user_id]
+                    })
+                } else {
+                    console.log("Error adding comment")
+                }
+                data.update_model("Recording", comment_data.clip_id, recording, true).then(function() {
+                    comment_template = doc.get_id('view_comment_template')
+                    if (recording.user_id != window.user_id) {
+                        sorted_comments = recording.comments.sort(function(a, b) {
+                            return b.datetime - a.datetime; })
+                        recording_comment = sorted_comments[0]
+                        comment_html = doc.render(comment_template, recording_comment).innerHTML
+                        doc.get_id(recording.id).querySelector("div.existing-comments").innerHTML += comment_html
+                    }
+                    doc.close_modal()
+                    try {
+                        update_timeline([recording])
+                    } catch (error) { console.log(error) }
+                })
+            })
+        }
+
+        /* Create a Snippet */
+        function add_snippet (event) {
+            var recording_id = event.target.closest(".recording-container").id
+
+            doc.notify_success("Loading Conversation", 'small')
+            
+            extract_snippet(recording_id)
+        }
+
+        /* Show Only Clips, Conversations, or Pictures */
+        function show_only_recording_type (event) {
+            var selected_option = event.currentTarget;
+            [...doc.get_class('show-option')].forEach(function(show_option) {
+                if (show_option.classList != selected_option.classList) {
+                    show_option.classList.remove("selected-option")
+                }
+            })
+            if (event.add_instead == true) { selected_option.classList.add("selected-option"); } 
+            else { selected_option.classList.toggle("selected-option"); }
+            var selected_type = selected_option.getAttribute("show-type")
+            var timeline_elements = [...doc.get_class("timeline-element-container")]
+            
+            if (scrapbook_data.show_only == selected_type) {
+                scrapbook_data.show_only = "";
+                
+                timeline_elements.forEach(function(tile) {
+                    tile.style.display = "inline-block";
+                    tile.classList.remove("squeezed-for-header");
+                    var tile_selector = tile.querySelector('div.recording-container')
+                    tile_selector.classList.remove("hide-for-date-header");
+                })
+            } else {
+                scrapbook_data.show_only = selected_type;
+                timeline_elements.forEach(function(tile) {
+                    
+                    tile.style.display = "inline-block";
+                    tile.classList.remove("squeezed-for-header")
+                    var tile_selector = tile.querySelector('div.recording-container');
+                    var recording_el_classlist = tile_selector.classList;
+                    recording_el_classlist.remove("hide-for-date-header")
+                    
+                    if (!tile.classList.contains("has-date-header")) {
+                        if (selected_type == "clips") {
+                            if (tile.classList.contains("conversation") || 
+                                tile.classList.contains("picture")) {
+                                tile.style.display = "none";
+                            }
+                        } else if (selected_type == "conversation") {
+                            if (tile.classList.contains("clips") || 
+                                tile.classList.contains("picture")) {
+                                tile.style.display = "none";
+                            }
+                        } else if (selected_type == "picture") {
+                            if (tile.classList.contains("clips") || 
+                                tile.classList.contains("conversation")) {
+                                tile.style.display = "none";
+                            }
+                        } else {
+                            tile.style.display = "inline-block";
+                        }
+                    } else {
+                        if (!tile.classList.contains(selected_type)) {
+                            recording_el_classlist.add("hide-for-date-header")
+                            tile.classList.add("squeezed-for-header")
+                        }
+                    }
+
+                })
+            }
+        }
+
+        /* Clear Search */
+        function clear_search (event) {
+            doc.get_class("selected-option")[0] ? doc.get_class("selected-option")[0].classList.remove("selected-option") : null;
+            doc.get_id('search_recordings_text').value = ""
+            doc.get_class("search-button")[0].click()
+        }
+
+        /* Toggle Display Options */
+        function toggle_display_options (event) {
+            var search_options_el = doc.get_id("search-filter-options")
+            var toggle_link_el = doc.get_id("toggle-display-options")
+            search_options_el.classList.toggle("expand-options")
+            if (search_options_el.classList.contains("expand-options")) {
+                toggle_link_el.innerHTML = "- Hide Options"
+            } else {
+                toggle_link_el.innerHTML = "+ More Options"
+            }
+        }
+
+
+        /* QUERIES AND DATA FLOW */
+
+        function run_standard_query (query_parameters) {
+            var collection_name = query_parameters.collection_name
+            var whereclauses = query_parameters.whereclauses
+            var order_by = query_parameters.order_by
+            var start_after = query_parameters.start_after
+            var limit = query_parameters.limit
+            var callback = query_parameters.callback
+            var callback_parameters = query_parameters.callback_parameters
+            var search_text = query_parameters.search_text
+
+            var collection_ref = window.db.collection(collection_name)
+            whereclauses.forEach(function(whereclause) {
+                collection_ref = collection_ref.where(
+                    whereclause[0],
+                    whereclause[1],
+                    whereclause[2])
+            })
+            
+            if (order_by != undefined) {
+                collection_ref = collection_ref.orderBy(order_by[0], order_by[1])
+            }
+
+            if (start_after != undefined) {
+                collection_ref = collection_ref.startAfter(start_after.doc)
+            }
+
+            if (limit != undefined) {
+                collection_ref = collection_ref.limit(limit)
+            }
+            
+            collection_ref.get().then(function(entries) {
+                var all_data = [];
+                entries.docs.forEach(function(entry) {
+                    var _data = entry.data();
+                    _data.id = entry.id;
+                    _data.doc = entry;
+                    all_data.push(_data)})
+                var entries = all_data;
+
+                if (collection_name == "Recording") {
+                    entries = entries.filter(x => (
+                        x.user_id == window.user_id || x.private == false))
+
+                    if (search_text != undefined && !doc.get_id('only_no_transcription').checked) {
+                        if (search_text.trim() != "") {
+                            entries = entries.filter(x => {
+                                if (x.transcription != undefined) {
+                                    return x.transcription.toLowerCase().includes(search_text.toLowerCase().trim())
+                                } else if (x.description != undefined) {
+                                    return x.description.toLowerCase().includes(search_text.toLowerCase().trim())
+                                }
+                                
+                            })
+                        }
+                    } else if (doc.get_id('only_no_transcription').checked) {
+                        entries = entries.filter(x => {
+                            if (x.transcription != undefined) {
+                                return x.transcription.trim() == ""
+                            } else if (x.description != undefined) {
+                                return x.description.trim() == ""
+                            }
+                        })
+                    }
+                }
+                
+                if (callback != undefined) {
+                    callback(entries, callback_parameters);
+                }
+            })
+        }
+
+        function run_subscription_query (query_parameters, subscription) {
+            var collection_name = query_parameters.collection_name
+            var whereclauses = query_parameters.whereclauses
+            var order_by = query_parameters.order_by
+            var start_after = query_parameters.start_after
+            var limit = query_parameters.limit
+            var callback = query_parameters.callback
+            var callback_parameters = query_parameters.callback_parameters
+            var search_text = doc.get_id('search_recordings_text').value
+
+            subscription = data.subscribe_collection(collection_name, {
+                query: function (query) {
+                    whereclauses.forEach(function(whereclause) {
+                        query = query.where(
+                            whereclause[0],
+                            whereclause[1],
+                            whereclause[2])
+                    })
+                    if (order_by != undefined) {
+                        query = query.orderBy(order_by[0], order_by[1])
+                    }
+
+                    if (start_after != undefined) {
+                        query = query.startAfter(start_after.doc)
+                    }
+
+                    if (limit != undefined) {
+                        query = query.limit(limit)
+                    }
+                    return query
+                }, 
+                update: function (entries) {
+                    if (callback != undefined) {
+                        if (collection_name == "Recording") {
+                            entries = entries.filter(x => (
+                                x.user_id == window.user_id || x.private == false))
+
+                            if (search_text != undefined) {
+                                if (search_text.trim() != "") {
+                                    entries = entries.filter(x => x.transcription.toLowerCase()
+                                        .includes(search_text.toLowerCase().trim()))
+                                }
+                            }
+                        }
+                        callback(entries, callback_parameters)
+                    }
+                }
+            })
+        }
+
+        function get_diff_ids (set_old, set_new) {
+            var added_ids = [];
+           
+            var set_old_ids = [];
+            var set_new_ids = [];
+            set_old.forEach(function(old_recording) { set_old_ids.push(old_recording.id) });
+            set_new.forEach(function(new_recording) { set_new_ids.push(new_recording.id) });
+
+            set_new_ids.forEach(function(new_id, entry_index) {
+                if (!set_old_ids.includes(new_id)) {
+                    added_ids.push([new_id, entry_index]);
+                }
+            })
+            return added_ids;
+        }
+
+        function get_initial_recordings () {
+            doc.get_id("scrabook-loader-display").style.display = 'block'
+            doc.get_id("timeline-recordings").style.display = 'none'
+            doc.get_id("no-results").style.display = 'none'
+            var subscription_type = determine_query_type()
+            var last_recording = scrapbook_data.last_recording
+
+            var initial_parameters = {
+                collection_name: "Recording",
+                order_by: ["time", "desc"],
+                start_after: undefined,
+                limit: scrapbook_data.query_limit,
+                callback_parameters: {},
+            }
+
+            function query_callback (next_recordings) {
+                doc.get_id("no-results").style.display = 'block'
+                doc.get_id("timeline-recordings").style.display = 'block'
+                doc.get_id("scrabook-loader-display").style.display = 'none'
+                var search_text = doc.get_id('search_recordings_text').value
+
+                if (scrapbook_data.first_batch.length > 0 && next_recordings.length > 0) {
+                    var diff_ids = get_diff_ids(scrapbook_data.first_batch, next_recordings);
+
+                    function insertAfter(el, referenceNode) {
+                        referenceNode.parentNode.parentNode.insertBefore(el, referenceNode.parentNode.nextSibling);
+                    }
+                    if (diff_ids.length > 0) {
+                        var diff_id = diff_ids[0];
+                        if (doc.get_id(diff_id) != null && doc.get_id(diff_id) != undefined) {
+
+                        } else {
+                            try {
+                                var before_element = doc.get_id(scrapbook_data.first_batch[diff_id[1]].id);
+                                var cleaned_recording_data = clean_recording(next_recordings[diff_id[1]])
+                                var new_tile = doc.render(doc.get_id("timeline-recording"), cleaned_recording_data)
+                                insertAfter(new_tile, before_element);
+                            } catch {
+                                console.log('Tiles not loaded yet');
+                            }
+                        }
+                    }
+                    
+                }
+                scrapbook_data.first_batch = next_recordings
+                scrapbook_data.last_recording = next_recordings[next_recordings.length - 1]
+
+                refresh_timeline(scrapbook_data.first_batch)
+                doc.get_id("scrabook-loader-display").style.display = 'none'
+                get_filtered_recordings() /* Get first batch after initial subcription query */
+            }
+            
+            if (subscription_type == 'my_recordings') {
+                if (scrapbook_data.first_batch.length == 0) {
+                    function sub_callback (next_recordings) {
+                        if (doc.get_id('filter_scrapbook').value == 'my_recordings') {
+                            query_callback(next_recordings);
+                        }
+                    }
+                    run_standard_query(Object.assign({}, initial_parameters,
+                        {whereclauses: [["user_id", "==", window.user_id]], callback: sub_callback}))
+                } 
+            }
+            else if (subscription_type == 'child_recordings') {
+                var kids = [doc.get_id('filter_scrapbook').value.replace('child_recordings_', '')]
+                if (kids.length > 0) {
+                    if (scrapbook_data.first_batch.length == 0) {
+                        function sub_callback (next_recordings) {
+                            if (doc.get_id('filter_scrapbook').value.includes('child_recordings_')) {
+                                query_callback(next_recordings);
+                            }
+                        }
+                        run_standard_query(Object.assign({}, initial_parameters, 
+                            {whereclauses: [["tagged_kids", "array-contains-any", kids]], callback: sub_callback}))
+                    } 
+                }
+            }
+            else if (subscription_type == 'tagged_adult') {  
+                var adults = [doc.get_id('filter_scrapbook').value.replace('tagged_adult_recordings_', '')]
+                if (adults.length > 0) {
+                    if (scrapbook_data.first_batch.length == 0) {
+                        function sub_callback (next_recordings) {
+                            if (doc.get_id('filter_scrapbook').value.includes('tagged_adult_recordings_')) {
+                                query_callback(next_recordings);
+                            }
+                        }
+                        run_standard_query(Object.assign({}, initial_parameters, 
+                            {whereclauses: [["tagged_adults", "array-contains-any", adults]], callback: sub_callback}))
+                    }
+                }
+            }
+            else if (subscription_type == 'all_recordings') {
+                var kids = scrapbook_data.accessible_kid_ids
+                function subscription_callback (other_recordings) {
+                    if (doc.get_id('filter_scrapbook').value == 'all_recordings') {
+                        scrapbook_data.initialized = true
+                        if (kids.length > 0) {
+                            function subscription_callback_composite (recordings) {
+                                if (doc.get_id('filter_scrapbook').value == 'all_recordings') {
+                                    var all_recordings = combine_recordings_sets(recordings, 
+                                        other_recordings);
+                                    all_recordings = all_recordings
+                                        .slice(0, scrapbook_data.query_limit)
+                                    query_callback(all_recordings);
+                                }
+                            }
+                            run_standard_query(Object.assign({}, initial_parameters,
+                                {whereclauses: [["tagged_kids", "array-contains-any", kids]], callback: subscription_callback_composite}))
+                        } else {
+                            var recordings = [];
+                            var all_recordings = combine_recordings_sets(recordings, other_recordings);
+                            all_recordings = all_recordings
+                                .slice(0, scrapbook_data.query_limit)
+                            query_callback(all_recordings);
+                        }
+                    }
+                }
+                if (scrapbook_data.initialized) {
+                    run_standard_query(Object.assign({}, initial_parameters,
+                        {whereclauses: [["user_id", "==", window.user_id]], callback: subscription_callback}))
+                } else {
+                    run_subscription_query(Object.assign({}, initial_parameters,
+                        {whereclauses: [["user_id", "==", window.user_id]], callback: subscription_callback,
+                        subscription: recording_subscription}))
+                }
+            }
+        }
+
+        function get_filtered_recordings (search_text=undefined, query_limit=undefined, start_after=undefined) {
+            var query_type = determine_query_type()
+
+            function filtered_callback (next_recordings) {
+                doc.get_id("scrabook-loader-display").style.display = 'none'
+                var search_text = doc.get_id('search_recordings_text').value
+                var no_transcription_checked = doc.get_id('only_no_transcription').checked
+                if (search_text.trim().length > 0 || no_transcription_checked) {
+                    refresh_timeline(next_recordings)
+                } 
+                scrapbook_data.next_recordings = next_recordings;
+                toggle_load_more();
+            }
+
+            if (query_limit == undefined) {
+                query_limit = scrapbook_data.query_limit
+            }
+
+            if (start_after == undefined) {
+                start_after = scrapbook_data.last_recording
+            } else if (start_after == 'start_at_first') {
+                start_after = undefined 
+            }
+
+            var initial_parameters = {
+                collection_name: "Recording",
+                order_by: ["time", "desc"],
+                start_after: start_after,
+                limit: query_limit,
+                callback_parameters: {},
+                search_text: search_text
+            }
+
+            if (query_type == 'my_recordings') {
+                run_standard_query(Object.assign({}, initial_parameters,
+                    {whereclauses: [["user_id", "==", window.user_id]], callback: filtered_callback}))
+            }
+            else if (query_type == 'child_recordings') {
+                var kids = [doc.get_id('filter_scrapbook').value
+                    .replace('child_recordings_', '')]
+                if (kids.length > 0) {
+                    run_standard_query(Object.assign({}, initial_parameters,
+                        {whereclauses: [["tagged_kids", "array-contains-any", kids]], callback: filtered_callback}))
+                }
+            }
+            else if (query_type == 'tagged_adult') {
+                var adults = [doc.get_id('filter_scrapbook').value
+                    .replace('tagged_adult_recordings_', '')]
+                if (adults.length > 0) {
+                    run_standard_query(Object.assign({}, initial_parameters,
+                        {whereclauses: [["tagged_adults", "array-contains-any", adults]], callback: filtered_callback}))
+                }
+            }
+            else if (query_type == 'all_recordings') {
+                var kids = scrapbook_data.accessible_kid_ids
+                function standard_query_callback (other_recordings, callback_params={}) {
+                    if (kids.length > 0) {
+                        function standard_query_callback_composite (recordings, _callback_params={}) {
+                            var all_recordings = combine_recordings_sets(recordings, other_recordings);
+                            all_recordings = all_recordings.slice(0, query_limit)
+                            filtered_callback(all_recordings);
+                        }
+                        run_standard_query(Object.assign({}, initial_parameters,
+                            {whereclauses: [["tagged_kids", "array-contains-any", kids]], callback: standard_query_callback_composite}))
+                    } else {
+                        var recordings = [];
+                        var all_recordings = combine_recordings_sets(recordings, other_recordings);
+                        all_recordings = all_recordings.slice(0, query_limit)
+                        filtered_callback(all_recordings);
+                    }
+                }
+                run_standard_query(Object.assign({}, initial_parameters,
+                    {whereclauses: [["user_id", "==", window.user_id]], callback: standard_query_callback}))
+            }
+        }
+
+        
+
+        /* HELPER FUNCTIONS */
+
+        /* Format Day and Time Info Text for Recording Tile */
+        function construct_day_time (date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var day_name = date.toLocaleDateString('en-US', { weekday: 'long' }); 
+
+            var ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            var time = hours + ':' + minutes + ' ' + ampm;
+
+            return time;
+        }
+
+        /* Format Month Day and Year Text for Recording Tile */
+        function construct_date_text (date) {
+            var month_name = date.toLocaleString('default', { month: 'short' });
+            var month_day = date.getDate();
+            var year = date.getFullYear();
+            return month_name + " " + month_day + ", " + year;
+        }
+
+        function epoch_toLocaleDateString (date) {
+            return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+        }
+
+        /* Combine one set of recordings with another */
+        function combine_recordings_sets (recordings, other_recordings) {
+
+            /* Concat Arrays With Unique Recordings and Display them */
+            var recordings_ids = recordings.map(function (el) { return el.id; });
+            var other_recordings_ids = other_recordings.map(function (el) { return el.id; });
+            var all_recordings = recordings;
+            for (var i=0; i<other_recordings.length; i++) {
+                if (!recordings_ids.includes(other_recordings[i].id)) {
+                    all_recordings.push(other_recordings[i]);
+                }
+            } 
+            return all_recordings.sort(function(a, b) {return b.time - a.time;});
+        }
+
+        /* Show and Hide No Results Message */
+        function hide_no_results () {
+            doc.get_id('no-results').style.display = 'none';
+        }
+
+        function show_no_results () {
+            doc.get_id('no-results').style.display = 'block';
+        }
+
+        /* Grab Tagged Children as Get HTML Icons */
+        function get_recording_tags_html (recording) {
+            var initials = "";
+            try {
+                var tagged_kids = recording.tagged_kids;
+
+                tagged_kids.forEach(function(tagged_kid) {
+                    if (tagged_child_objects.hasOwnProperty(tagged_kid)) {
+                        if (tagged_child_objects[tagged_kid].hasOwnProperty("kid_avatar")) {
+                            var kid_avatar = tagged_child_objects[tagged_kid].kid_avatar
+                            initials += doc.create_el("div", {
+                                className: "recording-icon",
+                                style: {
+                                    "background-image": "url('/images/SVG/Avatars/kid/" + kid_avatar + ".svg')"
+                                }
+                            }).outerHTML
+                        } else {
+                            initials += 
+                                "<div class='recording-icon'>" + 
+                                tagged_child_objects[tagged_kid].first_name[0] + "</div>";
+                        }
+                    }
+                })
+            } catch (error) {
+                initials = "";
+            }
+            try {
+                if (recording.hasOwnProperty('tagged_adults')) {
+                    var tagged_adults = recording.tagged_adults;
+                } else {
+                    var tagged_adults = [];
+                }
+                tagged_adults.forEach(function(tagged_adult) {
+                    if (tagged_adult_objects.hasOwnProperty(tagged_adult)) {
+                        if (tagged_adult_objects[tagged_adult].hasOwnProperty("parent_avatar")) {
+                            var parent_avatar = tagged_adult_objects[tagged_adult].parent_avatar
+                            initials += doc.create_el("div", {
+                                className: "recording-icon",
+                                style: {
+                                    "background-image": "url('/images/SVG/Avatars/parent/" + parent_avatar + ".svg')"
+                                }
+                            }).outerHTML
+                        } else {
+                            var val = tagged_adult_objects[tagged_adult].first_name[0]
+
+                            if (window.user_id == tagged_adult) {
+                                if (window.user_avatar != null) {
+                                    val = doc.create_el("div", {
+                                        className: "recording-icon",
+                                        style: {
+                                            "background-image": "url('/images/SVG/Avatars/parent/" + window.user_avatar + ".svg')"
+                                        }
+                                    }).outerHTML
+                                } else {
+                                    val = "me"    
+                                }
+                            }
+                            
+                            initials += "<div class='recording-icon'>" + val + "</div>";
+                        }
+                    }
+                })
+            } catch (error) {
+                initials = "";
+            }
+            return initials;
+        }
+
+        function get_child_age_text (recording) {
+            try {
+                var tagged_kids = recording.tagged_kids;
+                var ages_text = "&nbsp;";
+                if (tagged_kids != null &&
+                    tagged_kids != undefined) {
+                    if (tagged_kids.length > 1) {
+                        var num_viewable = 0;
+                        tagged_kids.forEach(function(tagged_kid) {
+                            if (tagged_child_objects.hasOwnProperty(tagged_kid)) {
+                                var age_values = get_child_age_values(tagged_kid, recording);
+                                if (parseInt(age_values.years) == 0) {
+                                    ages_text += String(age_values.months) + " months<br/>"
+                                } else {
+                                    ages_text +=  String(age_values.years) + " yrs " + 
+                                        String(age_values.months) + "mo<br/>";
+                                } num_viewable += 1 }})
+                        if (num_viewable >= 1) {return ages_text;} else {return "&nbsp;";}
+                    } else if (tagged_kids.length == 1) {
+                        var kid_id = tagged_kids[0];
+                        if (tagged_child_objects.hasOwnProperty(kid_id)) {
+                            var age_values = get_child_age_values(kid_id, recording);
+                            if (parseInt(age_values.years) == 0) {
+                                return String(age_values.months) + " months"
+                            } else {
+                                return String(age_values.years) + " yrs " + 
+                                    String(age_values.months) + " mo";
+                            }
+                        }
+                    }
+                } return ages_text; 
+            } 
+            catch (error) { return "&nbsp;"; }
+        }
+
+        function get_child_age_values (kid_id, recording) {
+
+            var valid_months = ["January", "February", "March", "April", "May", "June", 
+                "July", "August", "September", "October", "November", "December"];
+
+            var child_obj = tagged_child_objects[kid_id];
+            
+            if(child_obj.birth_month == "Feburary") {
+                child_obj.birth_month == "February"
+            }
+
+            var recording_date = recording.time;
+            var child_birthday = new Date(child_obj.birth_year, 
+                valid_months.indexOf(child_obj.birth_month), 1);
+
+            var years = new Date(recording_date).getFullYear() - 
+                child_birthday.getFullYear();
+            
+            if (new Date(recording_date).getMonth() < child_birthday.getMonth()) {
+                years -= 1;
+                var months =  12 - (child_birthday.getMonth() - 
+                    new Date(recording_date).getMonth());
+            } else {
+                var months = new Date(recording_date).getMonth() - 
+                    child_birthday.getMonth();
+            }
+
+            return {'years':years, 'months':months}
+        }
+
+        function determine_query_type () {
+            var scrapbook_filter_el_val = doc.get_id('filter_scrapbook').value;
+
+            /* Load next batch depending on query type */
+            if (scrapbook_filter_el_val == 'my_recordings') {
+                return 'my_recordings'
+            } else if (scrapbook_filter_el_val == 'all_recordings') {
+                return 'all_recordings'
+            } else if (scrapbook_filter_el_val.includes('child_recordings_')) {
+                return 'child_recordings'
+            } else if (scrapbook_filter_el_val.includes('tagged_adult_recordings_')) {
+                return 'tagged_adult'
+            }
+        }
+
+        function toggle_load_more (event) {
+            var load_more_button = doc.get_id('load-more-recordings');
+            load_more_button.style.display = 'none';
+            var no_transcription_only = doc.get_id('only_no_transcription').checked
+            var number_results = scrapbook_data.current_recordings.length + 
+                scrapbook_data.next_recordings.length
+            if (number_results == 0 && scrapbook_data.next_recordings.length == 0) {
+                load_more_button.style.display = 'none';
+            } else {
+                var current_typing = doc.get_id('search_recordings_text').value
+                if (current_typing.trim() == "" && !no_transcription_only && 
+                    scrapbook_data.next_recordings.length > 0) {
+                    load_more_button.style.display = 'block';
+                }
+                hide_no_results();
+            }
+            var recording_type_el = doc.get_class("show-options")[0].querySelector('span.show-option.selected-option')
+            if (recording_type_el != undefined) {
+                show_only_recording_type({currentTarget:recording_type_el, add_instead:true})
+            }
+        }
+
+        function set_button_to_loading (load_more_button) {
+            load_more_button.disabled = true
+            load_more_button.style.border = '2px solid transparent'
+            load_more_button.innerHTML = 'Loading...'
+            
+            setTimeout(function() {
+                load_more_button.style.border = '2px solid #FF7648'
+                load_more_button.disabled = false
+                load_more_button.innerHTML = 'Load More';
+            }, 1000)
+
+            if (scrapbook_data.next_recordings.length == 0) {
+                load_more_button.style.display = 'none';
+            } else {
+                load_more_button.style.display = 'block';
+            }
+        }
+
+    </script>
+
+</scrapbook-section>

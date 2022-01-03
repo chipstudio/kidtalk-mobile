@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "125090554030",
+    "firebase_url": "https://kidtalk-staging.firebaseio.com",
+    "project_id": "kidtalk-staging",
+    "storage_bucket": "kidtalk-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125090554030:android:97edd1871f6ab1d7250d3f",
+        "android_client_info": {
+          "package_name": "com.chipstudio.kidtalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "125090554030-e7jlmvdj9v55gcbfch1up62f8untq0pl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcbxbI1XMD4EDtAurJn-5vpZjiWj_rqEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "125090554030-e7jlmvdj9v55gcbfch1up62f8untq0pl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "125090554030-dbuoa56rkt6tcnj7pjoealv1srluoj30.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chipstudio.kidtalk"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

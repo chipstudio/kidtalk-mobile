@@ -1,0 +1,788 @@
+<survey-question definition>
+    
+    <template>
+        <!-- Survey Questions -->
+        <template id="survey_question_modal">
+            <form class="survey-question-form" name="survey_question_form">
+                <div id="survey-form-container">
+                    <h2 class="survey-question-title">Survey Question</h2>
+                    <input type="text" name="survey_question_id" value="{{survey_question_id}}" style="display:none;">
+                    <div id="primary-question">
+                        <div class="primary-question-text">{{question_text}}</div>
+                        <div class="primary-question-inputs">{{primary_inputs}}</div>
+                    </div>
+                    <div id="secondary-question" style="display:none;">
+                        <div class="secondary-question-text">{{secondary_question_text}}</div>
+                        <div class="secondary-question-inputs">{{secondary_inputs}}</div>
+                    </div>
+                    <input type="submit" for="survey_question_form" onclick="save_survey_response(event)">
+                    <div class="exit-options">Click the 'X' in the top left to stop viewing questions for now.</div>
+                </div>
+            </form>
+        </template>
+    </template>
+    
+    <style>
+
+        #survey-form-container input[type="submit"] {
+            background:#FF7648;
+            border:none;
+            border-radius:2.0rem;
+            color:white;
+            font-size:1.0rem;
+            font-weight:700;
+            height:auto;
+            margin:1.2rem 10% 1.0rem 10%;
+            padding:0.7rem;
+            text-align:center;
+            width:80%;
+        }
+
+        #survey-form-container input[type="text"] {
+            border:2px solid #444;
+            font-size:1.4rem;
+            line-height:2.2rem;
+            padding:0.2rem 0.4rem;
+            margin:0.6rem auto;
+            width:100%;
+        }
+
+        #survey-form-container input[type="range"] {
+            display:block;
+            width:100%;
+        }
+
+        #survey-form-container input[type="checkbox"] {
+            display:inline-block;
+            margin:0.6rem 0.6rem 0.6rem 0;
+            width:1.4rem;
+            height:1.4rem;
+        }
+
+        #survey-form-container {
+            padding:0 2.0rem 0.5rem 2.0rem;
+            position:relative;
+            bottom:2.0rem;
+        }
+
+        #survey-form-container label {
+            display:inline-block;
+            width:80%;
+            color:#FF7648;
+            font-size:1.2rem;
+            line-height:1.4rem;
+            margin:0.6rem 0.2rem;
+            vertical-align:top;
+        }
+
+        #survey-form-container .primary-question-text, 
+        #survey-form-container .secondary-question-text {
+            line-height:1.8rem;
+            margin-bottom:0.8rem;
+        }
+
+        h2.survey-question-title {
+            color:#FF7648;
+            font-size:1.6rem;
+            font-weight: 700;
+            margin-bottom:1.0rem;
+            text-align:center;
+        }
+
+        .primary-question-text, .secondary-question-text {
+            color:#444;
+            font-size:1.2rem;
+            line-height:1.6rem;
+        }
+
+        .secondary-question-text {
+            margin-top: 0.8rem;
+        }
+
+        .radio-input, .checkbox-input {
+            display:inline-block;
+            vertical-align:top;
+            width:20%;
+        }
+
+        .checkbox-input {
+            width:10%;
+        }
+
+        .exit-options {
+            color:#888;
+            text-align:center;
+            position:relative;
+            /*bottom:0.8rem;*/
+        }
+
+        #survey-form-container input[type='radio'].radio-input {
+            font-size:2.0rem;
+            width:1.8rem;
+            height:1.8rem;
+            margin:0.6rem 0;
+        }
+
+        #survey-form-container .radio-label, #survey-form-container .checkbox-label {
+            color:#FF7648;
+            display:inline-block;
+            vertical-align:top;
+            width:70%;
+            position:relative;
+            font-size:1.2rem;
+            margin:0.6rem 0;
+            margin-left:1.0rem;
+        }
+
+        #survey-form-container .checkbox-label {
+            margin-left: 5%;
+            width: 80%;
+        }
+
+        .survey-question-form {
+            position:relative;
+            bottom:1.0rem;
+        }
+
+        .survey-question-form strong {
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        select.survey-select {
+            background-color:transparent;
+            border:2px solid #444;
+            color:#444;
+            width:100%;
+            line-height:1.8rem;
+            font-size:1.2rem;
+            padding:0.6rem 0.2rem;
+            margin:0.6rem auto;
+        }
+    </style>
+
+    <script>
+        
+
+        /* SURVEY QUESTIONS */
+
+        var survey_questions = [{
+                'id': 1,
+                'one_answer_only': true,
+                'children_required': false,
+                'question': {
+                    'text': 'How many children do you have currently living with you?',
+                    'type': 'select',
+                    'options': ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9+'],
+                },
+                'sub_question': null,
+            }, {
+                'id': 2,
+                'one_answer_only': true,
+                'children_required': false,
+                'question': {
+                    'text': 'What language(s) do you speak at home?',
+                    'type': 'text',
+                    'options': 'text_field',
+                },
+                'sub_question': null,
+            }, {
+                'id': 3,
+                'one_answer_only': true,
+                'children_required': false,
+                'question': {
+                    'text': 'What is your gender?',
+                    'type': 'text',
+                    'options': 'text_field',
+                },
+                'sub_question': null,
+            }, {
+                'id': 4,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'Is your child-care arrangement different now than it was before the COVID-19 crisis (coronavirus)? ',
+                    'type': 'radio',
+                    'options': [
+                        'Yes', 
+                        'No',
+                    ],
+                },
+                'sub_question': {
+                    'text': 'Why has your situation changed? (Please select all that apply).',
+                    'triggers': ['Yes'],
+                    'type': 'checkbox',
+                    'options': [
+                        'illness (your child, you, or another caretaker)', 
+                        'school/daycare closures', 
+                        'stay-at-home orders', 
+                        'other',
+                    ],
+                },
+            }, {
+                'id': 5,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'Compared to a similar day one year ago, how much more childcare did you provide yesterday?',
+                    'type': 'select',
+                    'options': [
+                        'less', 
+                        'same', 
+                        '+1 hr', 
+                        '+2 hrs', 
+                        '+3 hrs', 
+                        '+4 hrs', 
+                        '+5 or more hrs',
+                    ],
+                },
+                'sub_question': {
+                    'text': 'How much of the extra childcare you did yesterday was during the hours you would normally be working?',
+                    'triggers': [
+                        '+1 hr', 
+                        '+2 hrs', 
+                        '+3 hrs', 
+                        '+4 hrs', 
+                        '+5 or more hrs',
+                    ],
+                    'type': 'range',
+                    'options': 'range', /* 0 to 100 */
+                },
+            }, {
+                'id': 6,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'Consider other adults who live with you. Yesterday, how much more childcare did all of them combined provide for your child or children compared to a typical day one year ago? <strong>If you are the only adult, choose "same.”</strong>',
+                    'type': 'select',
+                    'options': [
+                        'less', 
+                        'same', 
+                        '+1 hr', 
+                        '+2 hrs', 
+                        '+3 hrs', 
+                        '+4 hrs', 
+                        '+5 or more hrs',
+                    ],
+                },
+                'sub_question': null,
+            }, {
+                'id': 7,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'Has your household income decreased since before the COVID-19 crisis (because of job loss, reduced hours, closure of family business, and so on)?',
+                    'type': 'radio',
+                    'options': ['Yes', 'No'],
+                },
+                'sub_question': {
+                    'text': 'By how much?',
+                    'triggers': ['Yes'],
+                    'type': 'select',
+                    'options': [
+                        'less than a quarter', 
+                        'more than a quarter', 
+                        'more than half', 
+                        'more than three quarters', 
+                        'all',
+                    ],
+                },
+            }, {
+                'id': 8,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': '<strong>This week,</strong> did you receive any financial help from the government as a result of the crisis?',
+                    'type': 'radio',
+                    'options': ['Yes', 'No'],
+                },
+                'sub_question': {
+                    'text': 'What type of financial help did you receive? (Select all that apply)',
+                    'triggers': ['Yes'],
+                    'type': 'checkbox',
+                    'options': [
+                        'stimulus payments', 
+                        'unemployment benefits', 
+                        'other',
+                    ],
+                },
+            }, {
+                'id': 9,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': '<strong>Yesterday,</strong> how much sleep did you get?',
+                    'type': 'select',
+                    'options': [
+                        '0 hrs', 
+                        '1 hr', 
+                        '2 hrs', 
+                        '3 hrs', 
+                        '4 hrs', 
+                        '5 hrs', 
+                        '6 hrs', 
+                        '7 hrs', 
+                        '8 hrs', 
+                        '9+ hrs'
+                    ],
+                },
+                'sub_question': null,
+            }, {
+                'id': 10,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'How worried are you about having enough food or money?',
+                    'type': 'radio',
+                    'options': [
+                        'not at all', 
+                        'a little', 
+                        'medium', 
+                        'a lot', 
+                        'a whole lot',
+                    ],
+                },
+                'sub_question': null,
+            }, {
+                'id': 11,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'How worried are you about you or a family member getting sick?',
+                    'type': 'radio',
+                    'options': ['not at all', 'a little', 'medium', 'a lot', 'a whole lot'],
+                },
+                'sub_question': null,
+            }, {
+                'id': 12,
+                'one_answer_only': false,
+                'children_required': false,
+                'question': {
+                    'text': 'How worried are you about everything <em>other than</em> having enough food/money and you or a family member getting sick?',
+                    'type': 'radio',
+                    'options': [
+                        'not at all', 
+                        'a little', 
+                        'medium', 
+                        'a lot', 
+                        'a whole lot'
+                    ],
+                },
+                'sub_question': null,
+            }, {
+                'id': 13,
+                'one_answer_only': false,
+                'children_required': true,
+                'question': {
+                    'text': 'Compared to a similar day one year ago, how much screen time (TV, phones, tablets, computers) did your <strong>youngest child</strong> get <strong>yesterday?</strong>',
+                    'type': 'select',
+                    'options': [
+                        'less time', 
+                        'same', 
+                        '30 minutes more', 
+                        '1 hour more', 
+                        '2 hours more', 
+                        '3 hours more', 
+                        '4+ hours more',
+                    ],
+                },
+                'sub_question': null,
+            }, {
+                'id': 14,
+                'one_answer_only': false,
+                'children_required': true,
+                'question': {
+                    'text': 'Compared to similar days one year ago, how much enrichment and educational activities did your youngest child get at home yesterday (reading, being read to, doing homework, playing music, and so on)?',
+                    'type': 'radio',
+                    'options': [
+                        'much less', 
+                        'slightly less', 
+                        'about the same', 
+                        'slightly more', 
+                        'much more', 
+                    ],
+                },
+                'sub_question': null,
+            },
+        ];
+
+
+        /* MAIN FUNCTIONS */
+
+
+        /* Get New Survey Question */
+        function get_new_survey_question (user_model) {
+            var right_now = new Date()
+            var last_seen = new Date(user_model.last_saw_survey)
+            
+            const ms_in_day = 1000 * 60 * 60 * 24;
+            
+            const utc1 = Date.UTC(right_now.getFullYear(), 
+                right_now.getMonth(), right_now.getDate());
+            const utc2 = Date.UTC(last_seen.getFullYear(), 
+                last_seen.getMonth(), last_seen.getDate());
+            
+            var num_days =  Math.floor((utc1 - utc2) / ms_in_day);
+
+            /* If they've completed signing up and have never seen */
+            /* or it's been more than 3 days */
+            if (user_model.has_initialed && (num_days >= 3 || 
+                    user_model.last_saw_survey == undefined ||
+                    user_model.last_saw_survey == null)) {
+
+                /* Determine question type and display it */
+                determine_question_type(user_model);
+            }
+        }
+
+        /* Render survey question in modal */
+        function show_new_survey_question(question_number) {
+            var question_id = question_number
+            var question_obj = survey_questions[question_id-1]
+            
+            var modal_template = doc.get_id("survey_question_modal")
+
+            /* Set Up Survey Fields */
+            var primary_inputs = create_primary_field_options(question_obj);
+            if (question_obj.sub_question == null) {
+                var secondary_question_text = '';
+                var secondary_inputs = '';
+            } else {
+                var secondary_question_text = question_obj.sub_question.text
+                var secondary_inputs = create_secondary_field_options(question_obj)
+            }
+
+            /* Render Modal With Survey Question */
+            modal_html = doc.render(modal_template, {
+                primary_inputs: primary_inputs,
+                question_text:question_obj.question.text,
+                secondary_question_text: secondary_question_text,
+                secondary_inputs: secondary_inputs,
+                survey_question_id: question_obj.id,
+            }).innerHTML
+            doc.render_modal(modal_html);
+        }
+
+        /* Get Question Based on Answer History (Random For Now) */
+        function load_survey_question (user_model) {
+            get_new_survey_question(user_model)
+        }
+
+        /* Create Primary Survey Question Fields */
+        function create_primary_field_options (question_obj) {
+            if (question_obj.question.type == 'radio') {
+                primary_inputs = create_radio_fields(
+                    question_obj.question.options, question_obj.id);
+            } else if (question_obj.question.type == 'select') {
+                primary_inputs = create_select_field(
+                    question_obj.question.options, question_obj.id);
+            } else if (question_obj.question.type == 'checkbox') {
+                primary_inputs = create_checkbox_fields(
+                    question_obj.question.options, question_obj.id);
+            } else if (question_obj.question.type == 'text') {
+                primary_inputs = 
+                    '<input type="text" name="primary_survey_answer" onkeyup="if (event.keyCode==13){ $(this).blur(); }">';
+            }
+            return primary_inputs;
+        }
+
+        /* Create Secondary Survey Question Fields */
+        function create_secondary_field_options (question_obj) {
+            if (question_obj.sub_question.type == 'radio') {
+                secondary_inputs = create_radio_fields(
+                    question_obj.sub_question.options, question_obj.id, false);
+            } else if (question_obj.sub_question.type == 'select') {
+                secondary_inputs = create_select_field(
+                    question_obj.sub_question.options, question_obj.id, false);
+            } else if (question_obj.sub_question.type == 'checkbox') {
+                secondary_inputs = create_checkbox_fields(
+                    question_obj.sub_question.options, question_obj.id);
+            } else if (question_obj.sub_question.type == 'range') {
+                secondary_inputs = create_slider_field(
+                    question_obj.id, 0, 100);
+            }
+            return secondary_inputs;
+        }
+
+        /* Give Primary Answer, Show Follow Up if Appropriate */
+        function give_primary_survey_answer (event) {
+            var primary_option_value = event.currentTarget.value
+            var question_id = event.currentTarget.getAttribute('data-survey_id');
+
+            var questions_with_subs = [];
+            survey_questions.forEach(function(survey_question) {
+                if (survey_question.sub_question != null) {
+                    questions_with_subs.push(String(survey_question.id))
+                }
+            })
+            
+            if (questions_with_subs.includes(String(question_id))) {
+                if (survey_questions[question_id - 1]
+                    .sub_question.triggers.includes(primary_option_value)) {
+                    doc.get_id('secondary-question').style.display = 'block';
+                } else {
+                    doc.get_id('secondary-question').style.display = 'none';
+                } 
+            }
+        }
+
+        /* Multi Answer Questions */
+        function get_multi_week_questions (children_in_house, multi_qs, child_req_qs, user_model) {
+            var every_several_weeks_questions = multi_qs;
+            var children_required_questions = child_req_qs;
+
+            /* Filter out non applicable questions */
+            var possible_questions = every_several_weeks_questions;
+            if (!children_in_house) {
+                possible_questions = possible_questions
+                    .filter(x => !children_required_questions.includes(x))}
+
+            var ourDate = new Date();
+            var pastDate = ourDate.getDate() - 14;
+            ourDate.setDate(pastDate);
+
+            var two_weeks_ago = ourDate.getTime();
+
+            var collection_ref = window.db.collection("SurveyResponse")
+                .where('user_id', '==', user_model.id)
+                .where('time', '>', two_weeks_ago)
+            collection_ref.get().then(function(data) {
+                var all_data = [];
+                data.docs.forEach(function(doc) {
+                    var _data = doc.data();
+                    _data.id = doc.id;
+                    all_data.push(doc.data())})
+                
+                var responses = all_data;
+                responses = responses.filter(x => possible_questions
+                    .includes(x.question_number))
+                
+                var questions_answered = [];
+                responses.forEach(function(response) {
+                    if (!questions_answered
+                        .includes(response.question_number)) {
+                        questions_answered.push(response.question_number)
+                    }
+                })
+                var questions_left = possible_questions
+                    .filter(x => !questions_answered.includes(x))
+                
+                if (questions_left.length > 0) {
+                    var question_idx = generate_random_integer(0, 
+                        questions_left.length - 1)
+                    var question_to_answer = questions_left[question_idx]
+                    
+                    if (question_to_answer != undefined &&
+                        question_to_answer != null) {
+                        show_new_survey_question(question_to_answer);
+                    }
+                }
+            })
+        }
+
+        /* Determine Question Type */
+        function determine_question_type (user_model) {
+
+            /* Survey Specific Attributes */
+            var once_only_questions = [1, 2, 3];
+            var every_several_weeks_questions = [
+                4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]; 
+
+            /* All correct but hard coded, will want to abstract later */
+            var children_required_questions = [13, 14];
+            var how_many_children_question = 1;
+
+            var collection_ref = window.db.collection("SurveyResponse")
+                .where('user_id', '==', user_model.id)
+                .where('question_number', 'in', once_only_questions);
+            
+            collection_ref.get().then(function(data) {
+                var all_data = [];
+                data.docs.forEach(function(doc) {
+                    var _data = doc.data();
+                    _data.id = doc.id;
+                    all_data.push(doc.data())})
+                
+                var responses = all_data;
+
+                /* First Check for Single Use Questions */
+                var answered = [];
+                var children_in_house = false;
+                responses.forEach(function(response) {
+
+                    /* Determine which questions have been answered already */
+                    if (!answered
+                        .includes(response.question_number)) {
+                        answered.push(response.question_number)
+                    }
+
+                    /* Filter our certain questions if no children in house */
+                    if (response.question_number == how_many_children_question) {
+                        if (parseInt(response.primary_answer) > 0 ||
+                            response.primary_answer == '9+') {
+                            children_in_house = true;
+                        }
+                    }
+                })
+
+                /* Based on answered question, get unanswered questions */
+                var not_answered = [];
+                once_only_questions.forEach(function(once_only_q) {
+                    if (!answered.includes(once_only_q)) {
+                        not_answered.push(once_only_q)}})
+
+                var question_to_answer = null;
+
+                /* If there's just one single use question left, use that one */
+                if (not_answered.length == 1) {
+                    var question_to_answer = not_answered[0];
+                    show_new_survey_question(question_to_answer);
+
+                /* If multiple single use question left, pick one randomly */
+                } else if (not_answered.length > 1) {
+                    var question_idx = generate_random_integer(0, 
+                        not_answered.length - 1)
+                    var question_to_answer = not_answered[question_idx];
+                    show_new_survey_question(question_to_answer);
+
+                /* If all single use questions are exhausted, use multi use question */
+                } else if (not_answered.length == 0) {
+                    get_multi_week_questions(children_in_house, 
+                        every_several_weeks_questions, 
+                        children_required_questions,
+                        user_model)
+                }
+            })
+        }
+
+        /* On Submit of Survey Question Response */
+        function save_survey_response (event) {
+            event.preventDefault()
+            event.stopPropagation()
+
+            var survey_data = doc.serialize(doc.get_id('survey-form-container'));
+            var survey_question_obj_idx = survey_questions
+                .map(function (el) { return el.id; });
+
+            survey_question_obj_idx = survey_question_obj_idx
+                .indexOf(parseInt(survey_data.survey_question_id))
+
+            var survey_question_obj = survey_questions[survey_question_obj_idx];
+
+            var sub_question_text = "N/A";
+            if (survey_question_obj.sub_question != null) {
+                sub_question_text = survey_question_obj.sub_question.text;
+            }
+
+            var secondary_keys = Object.keys(survey_data)
+                .filter(x => x.startsWith('secondary_survey_answer'))
+
+            var secondary_answers = [];
+            secondary_keys.forEach(function(secondary_key) {
+                if (secondary_key == 'secondary_survey_answer') {
+                    secondary_answers = [survey_data[secondary_key]]
+                } else {
+                    if (survey_data[secondary_key] == true) {
+                        secondary_answers.push(
+                            String(secondary_key.split('secondary_survey_answer_')[1]))
+                    } else if (parseInt(survey_data[secondary_key]) >= 0 &&
+                        parseInt(survey_data[secondary_key]) <= 100) {
+                            secondary_answers.push(survey_data[secondary_key])
+                    }
+                }
+            }) 
+            
+            /* Save Survey Response and Update User Model with last seen time */
+            data.get_model_including_id("User", window.user_id).then(function(user_obj) {
+                var update_user_obj = user_obj;
+                update_user_obj.last_saw_survey = (new Date).getTime()
+                data.update_model("User", user_obj.id, update_user_obj).then(function() {
+                    data.create_model("SurveyResponse", {
+                        user_id: user_obj.id,
+                        question_number: parseInt(survey_data.survey_question_id),
+                        question_text: survey_question_obj.question.text,
+                        sub_question_text: sub_question_text,
+                        primary_answer: survey_data.primary_survey_answer,
+                        secondary_answers: secondary_answers,
+                        time: (new Date).getTime(),
+                    }).then(function() {
+                        doc.close_modal()
+                        determine_question_type(user_obj)
+                    })
+                })
+            })
+        }
+        
+
+
+        /* HELPER FUNCTIONS */
+
+        function generate_random_integer (minimum, maximum) {
+            var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+            return randomnumber
+        }
+
+        /* HTML Helper Functions, can also use templates */
+        function create_radio_fields (options, question_id, primary=true) {
+            var radio_buttons = '';
+            if (primary) { 
+                var primary_event = 'onchange="give_primary_survey_answer(event)"' +
+                    'name="primary_survey_answer"';
+            } else { 
+                var primary_event = 'name="secondary_survey_answer"'; 
+            }
+            options.forEach(function(option) {
+                radio_buttons += '<input class="radio-input" ' + primary_event +
+                    ' value="' + String(option) +  '" type="radio" data-survey_id="' + 
+                    String(question_id) + '"><label for="' + String(option) + '" class="radio-label">' + 
+                    String(option) + '</label><br/>'})
+            return radio_buttons;
+        }
+
+        function create_select_field (options, question_id, primary=true) {
+            if (primary) { 
+                var primary_event = 'onchange="give_primary_survey_answer(event)"' +
+                    'name="primary_survey_answer"';
+            }
+            else { 
+                var primary_event = 'name="secondary_survey_answer"'; 
+            }
+            var select_field = '<select class="survey-select" data-survey_id="' + 
+                String(question_id) + '" ' + primary_event + '>';
+
+            select_field += '<option value="" disabled selected>Please choose an option</option>'
+            
+            options.forEach(function(option) {
+                select_field += '<option value="' + String(option) + '">' + 
+                    String(option) + '</option>';}) 
+            
+            select_field += "</select>";
+            return select_field;
+        }
+
+        function create_checkbox_fields (options, question_id) {
+            var checkboxes = '';
+            options.forEach(function(option) {
+                checkboxes += '<input class="checkbox-input" data-survey_id="' + String(question_id) + 
+                    '" value="' + String(option) + '" type="checkbox" name="' + 'secondary_survey_answer_' + 
+                    String(option) + '"><label for="' + String(option) + '" class="checkbox-label">' + 
+                    String(option) + '</label><br/>'})
+            return checkboxes;
+        }
+
+        function create_slider_field (question_id, min=0, max=100) {
+            return '<input name="secondary_survey_answer_slider" type="range" min="' + String(min) + 
+                '" max="' + String(max) + '" oninput="adjust_slider_display(event)">' + 
+                '<label id="secondary_slider_label" ' + 'for="secondary_survey_answer_slider">50%</label>'
+        }
+
+        function adjust_slider_display (event) {
+            doc.get_id('secondary_slider_label').innerHTML = String(event.currentTarget.value) + "%";
+        }
+
+        /* END OF SURVEY CODE */
+
+
+    </script>
+
+</survey-question>

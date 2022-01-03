@@ -1,0 +1,46 @@
+<version-history definition>
+  <template>
+    <template id="version-history">
+      <div class="version_history" data-version="{{version}}">
+        <b>Version {{version}}</b>
+        <i>{{date}}</i>
+        <ul>
+          <li>{{change_1}}</li>
+          <li>{{change_2}}</li>
+          <li>{{change_3}}</li>
+          <li>{{change_4}}</li>
+          <li>{{change_5}}</li>
+        </ul>
+        <br />
+      </div>
+    </template>
+    <div id="version-histories"></div>
+  </template>
+
+  <style>
+    .version_history {
+      max-width: 480px;
+      margin:0 auto;
+    }
+    li:empty {
+      display: none;
+    }
+  </style>
+
+  <script type="text/javascript">
+    function load_version_history() {
+      doc.get_json("./version-history.json").then((json) => {
+        var version_histories_container = doc.get_id("version-histories");
+        var version_history_template = doc.get_id("version-history");
+
+        doc.clear_and_replace(
+            json.version_history,
+            version_histories_container,
+            version_history_template
+        );
+
+        doc.get_id("latest-version").innerHTML = "v" + json.version_history[0].version
+      });
+    }
+  </script>
+</version-history>

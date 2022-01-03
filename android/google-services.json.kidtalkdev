@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "271962176686",
+    "firebase_url": "https://kidtalkdev.firebaseio.com",
+    "project_id": "kidtalkdev",
+    "storage_bucket": "kidtalkdev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271962176686:android:011a89c1186705c825013f",
+        "android_client_info": {
+          "package_name": "com.chipstudio.kidtalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271962176686-31ecdqhsluvcnih6nn77rvd96ierqahd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chipstudio.kidtalk",
+            "certificate_hash": "75bcf81c88b56ff7fa33c889c94231af2ef6873d"
+          }
+        },
+        {
+          "client_id": "271962176686-vv4j0dih9f76voln1a6doh6nll3akknd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaSCqXrulsPXBmMb88n8XGPbgZ1niyUKM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271962176686-vv4j0dih9f76voln1a6doh6nll3akknd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
