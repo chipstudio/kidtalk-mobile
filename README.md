@@ -1,4 +1,8 @@
-﻿# kidtalk-mobile
+# Kidtalk-Mobile
+ 
+Overview
+-----
+KidTalk Android wraps the current webapp into an Ionic 3 wrapper that is then deployed onto Android devices. You can view a breakdown of the additional code in the `android` folder at the base of this repo. KidTalk iOS uses a similarly compatible, Phonegap wrapper.
 
 
 Tech Stack:
